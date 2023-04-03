@@ -1,7 +1,11 @@
 #include "MobiController.hpp"
 
-MobiController::MobiController() {
+#include "min.h"
+
+MobiController::MobiController(min_context *min_ctx) : min_ctx(min_ctx) {
+  min_init_context(this->min_ctx, 0);
 }
 
-MobiController::~MobiController() {
+void MobiController::loop() {
+  min_poll(this->min_ctx, {}, 0);
 }

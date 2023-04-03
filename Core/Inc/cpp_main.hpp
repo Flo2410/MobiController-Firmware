@@ -7,7 +7,8 @@ extern "C" {
 
 #include "stm32l4xx.h"
 
-extern uint8_t rx_buffer[64];
+extern uint8_t rx_buffer[265];
+extern struct min_context min_ctx;
 
 int cpp_main();
 

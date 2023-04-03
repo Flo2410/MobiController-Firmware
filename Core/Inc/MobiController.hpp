@@ -5,10 +5,12 @@
 
 class MobiController {
  public:
-  MobiController();
+  MobiController(min_context *min_ctx);
+
+  void loop();
 
  private:
-  struct min_context min_ctx;
+  min_context *min_ctx;
 
   ~MobiController();
 };

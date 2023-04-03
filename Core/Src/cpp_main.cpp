@@ -2,10 +2,12 @@
 
 #include "MobiController.hpp"
 #include "main.h"
+#include "min.h"
 #include "stdio.h"
 #include "stm32l452xx.h"
 
-uint8_t rx_buffer[64];
+uint8_t rx_buffer[265];
+struct min_context min_ctx;
 
 int cpp_main() {
   printf("\n----------------------------------------\n");
@@ -15,9 +17,9 @@ int cpp_main() {
   printf("Copyright FHWN Florian Hye\n");
   printf("----------------------------------------\n\n");
 
-  MobiController *mobictl = new MobiController();
+  MobiController *mobictl = new MobiController(&min_ctx);
 
   while (1) {
-    /* Super loop */
+    mobictl->loop();
   }
 }

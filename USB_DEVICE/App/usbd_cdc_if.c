@@ -23,6 +23,7 @@
 
 /* USER CODE BEGIN INCLUDE */
 #include "cpp_main.hpp"
+#include "min.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -264,6 +265,8 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   uint8_t len = (uint8_t)*Len;
   memcpy(rx_buffer, Buf, len);  // copy the data to the rx_buffer
   memset(Buf, '\0', len);       // clear the Buf also
+
+  min_poll(&min_ctx, rx_buffer, len);
 
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
