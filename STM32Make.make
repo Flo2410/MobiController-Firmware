@@ -36,6 +36,7 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
+../libraries/min/target/min.c \
 Core/Src/ARGB.c \
 Core/Src/adc.c \
 Core/Src/bno055.c \
@@ -164,6 +165,7 @@ AS_INCLUDES = \
 # C includes
 C_INCLUDES =  \
 -I../libraries/etl/include \
+-I../libraries/min/target \
 -ICore/Inc \
 -IDrivers/CMSIS/Device/ST/STM32L4xx/Include \
 -IDrivers/CMSIS/Include \
