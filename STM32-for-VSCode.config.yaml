@@ -40,7 +40,8 @@ asDefinitionsFile:
 
 # Compiler flags
 cFlags: []
-cxxFlags: []
+cxxFlags:
+  - -std=gnu++17
 assemblyFlags: []
 linkerFlags:
   - -specs=nano.specs

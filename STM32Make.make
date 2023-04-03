@@ -191,7 +191,7 @@ endif
 # Add additional flags
 CFLAGS += 
 ASFLAGS += 
-CXXFLAGS += 
+CXXFLAGS += -std=gnu++17 
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
