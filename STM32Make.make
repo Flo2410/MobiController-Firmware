@@ -39,7 +39,6 @@ C_SOURCES =  \
 ../libraries/min/target/min.c \
 Core/Src/ARGB.c \
 Core/Src/adc.c \
-Core/Src/bno055.c \
 Core/Src/can.c \
 Core/Src/capture_test.c \
 Core/Src/dma.c \
@@ -88,6 +87,7 @@ USB_DEVICE/Target/usbd_conf.c
 
 
 CPP_SOURCES = \
+Core/Src/Bno055.cpp \
 Core/Src/MobiController.cpp \
 Core/Src/bh1750.cpp \
 Core/Src/can_lib.cpp \
