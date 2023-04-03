@@ -6,9 +6,9 @@ extern "C" {
 #endif
 // #define FREERTOS_ENABLED true
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
+#include "stdbool.h"
+#include "stdio.h"
+#include "stm32l452xx.h"
 
 #define START_BYTE 0xAA
 #define RESPONSE_BYTE 0xBB
