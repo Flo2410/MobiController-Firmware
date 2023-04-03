@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "showDevDebugOutput": "parsed",
+      "cwd": "${workspaceRoot}",
+      "executable": "./build/MobiController-Firmware.elf",
+      "name": "Debug STM32",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "preLaunchTask": "Build STM",
+      "device": "stm32l452",
+      "configFiles": ["openocd.cfg"],
+      "svdFile": "STM32L4R5.svd"
+    },
+    {
+      "showDevDebugOutput": "parsed",
+      "cwd": "${workspaceRoot}",
+      "executable": "./build/MobiController-Firmware.elf",
+      "name": "Attach STM32",
+      "request": "attach",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "preLaunchTask": "Build STM",
+      "device": "stm32l452",
+      "configFiles": ["openocd.cfg"],
+      "svdFile": "STM32L4R5.svd"
+    }
+  ]
+}

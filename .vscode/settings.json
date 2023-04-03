@@ -1,0 +1,4 @@
+{
+  "cortex-debug.armToolchainPath": "/home/florian/stm32/gcc-arm-none-eabi-10.3-2021.10/bin",
+  "cortex-debug.openocdPath": "/usr/bin/openocd"
+}

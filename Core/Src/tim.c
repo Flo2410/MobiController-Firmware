@@ -1,27 +1,31 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    tim.c
-  * @brief   This file provides code for the configuration
-  *          of the TIM instances.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    tim.c
+ * @brief   This file provides code for the configuration
+ *          of the TIM instances.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
 
+TIM_Channel_Struct TIM_Channel_1 = {TIM_CHANNEL_1, HAL_TIM_ACTIVE_CHANNEL_1, TIM_IT_CC1};
+TIM_Channel_Struct TIM_Channel_2 = {TIM_CHANNEL_2, HAL_TIM_ACTIVE_CHANNEL_2, TIM_IT_CC2};
+TIM_Channel_Struct TIM_Channel_3 = {TIM_CHANNEL_3, HAL_TIM_ACTIVE_CHANNEL_3, TIM_IT_CC3};
+TIM_Channel_Struct TIM_Channel_4 = {TIM_CHANNEL_4, HAL_TIM_ACTIVE_CHANNEL_4, TIM_IT_CC4};
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim1;
