@@ -309,8 +309,7 @@ Bno055::vector_t Bno055::get_vector(uint8_t vec) {
 
   if (vec == VECTOR_MAGNETOMETER) {
     scale = this->mag_scale;
-  } else if (vec == VECTOR_ACCELEROMETER ||
-             vec == VECTOR_LINEARACCEL || vec == VECTOR_GRAVITY) {
+  } else if (vec == VECTOR_ACCELEROMETER || vec == VECTOR_LINEARACCEL || vec == VECTOR_GRAVITY) {
     scale = this->accel_scale;
   } else if (vec == VECTOR_GYROSCOPE) {
     scale = this->angular_rate_scale;
