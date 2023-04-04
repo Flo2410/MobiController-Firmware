@@ -1,8 +1,8 @@
-#include "ARGB.h"
-#include "stm32l4xx.h"
-
 #ifndef LED_STRIP_H_
 #define LED_STRIP_H_
+
+#include "ARGB.h"
+#include "stm32l4xx.h"
 
 namespace LED_STRIP {
 
