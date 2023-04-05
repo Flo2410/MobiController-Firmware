@@ -11,8 +11,8 @@ class PayloadBuilder {
   void append_uint8(uint8_t number);
   void append_uint16(uint16_t number);
   void append_uint32(uint32_t number);
-  void append(float number);
-  void append(double number);
+  void append_float(float number);
+  void append_double(double number);
 
   uint8_t* get_payload();
   size_t size();

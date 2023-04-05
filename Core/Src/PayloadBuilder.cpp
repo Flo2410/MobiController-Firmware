@@ -12,17 +12,25 @@ void PayloadBuilder::append_uint8(uint8_t number) {
 void PayloadBuilder::append_uint16(uint16_t number) {
   uint8_t buffer[2];
   etl::mem_copy((uint8_t*)&number, 2, buffer);
-  this->payload.push_back(buffer[0]);
-  this->payload.push_back(buffer[1]);
+  this->payload.insert(this->payload.end(), buffer, buffer + 2);
 }
 
 void PayloadBuilder::append_uint32(uint32_t number) {
+  uint8_t buffer[4];
+  etl::mem_copy((uint8_t*)&number, 4, buffer);
+  this->payload.insert(this->payload.end(), buffer, buffer + 4);
 }
 
-void PayloadBuilder::append(float number) {
+void PayloadBuilder::append_float(float number) {
+  uint8_t buffer[4];
+  etl::mem_copy((uint8_t*)&number, 4, buffer);
+  this->payload.insert(this->payload.end(), buffer, buffer + 4);
 }
 
-void PayloadBuilder::append(double number) {
+void PayloadBuilder::append_double(double number) {
+  uint8_t buffer[8];
+  etl::mem_copy((uint8_t*)&number, 8, buffer);
+  this->payload.insert(this->payload.end(), buffer, buffer + 8);
 }
 
 uint8_t* PayloadBuilder::get_payload() {
