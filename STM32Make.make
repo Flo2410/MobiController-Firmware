@@ -88,6 +88,7 @@ USB_DEVICE/Target/usbd_conf.c
 CPP_SOURCES = \
 Core/Src/Bno055.cpp \
 Core/Src/MobiController.cpp \
+Core/Src/PayloadBuilder.cpp \
 Core/Src/bh1750.cpp \
 Core/Src/can_lib.cpp \
 Core/Src/cpp_main.cpp \
