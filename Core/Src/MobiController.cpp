@@ -15,6 +15,7 @@ void MobiController::loop() {
 }
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
+  // TODO: Check if min_id is a valid command
   QueuedCommand cmd = {
       .min_id = static_cast<COMMANDS>(min_id),
       .payload = min_payload,
@@ -23,7 +24,10 @@ void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, u
 }
 
 void MobiController::handle_command_queue() {
-  while (this->command_queue.size() > 0) {
+  // Allow for the processing of 10 commands
+  for (size_t i = 0; i < 10; i++) {
+    if (this->command_queue.size() == 0) return;
+
     QueuedCommand cmd;
     this->command_queue.pop_into(cmd);
 
@@ -59,7 +63,10 @@ void MobiController::queue_data_frame(DATA data) {
 }
 
 void MobiController::handle_data_frame_queue() {
-  while (this->data_frame_queue.size() > 0) {
+  // Allow for the processing of 10 data frames
+  for (size_t i = 0; i < 10; i++) {
+    if (this->data_frame_queue.size() == 0) return;
+
     DATA data;
     this->data_frame_queue.pop_into(data);
 
