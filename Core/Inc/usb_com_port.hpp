@@ -1,6 +1,7 @@
 #ifndef USB_COM_PORT_H_
 #define USB_COM_PORT_H_
 
+#include "MobiController.hpp"
 #include "PayloadBuilder.hpp"
 #include "etl/queue.h"
 #include "etl/string.h"
@@ -14,6 +15,10 @@ void send_str(etl::string<64> str);
 void send_data(uint8_t* data, uint16_t len);
 
 void queue_payload(uint8_t min_id, PayloadBuilder* pb);
+void queue_payload(MobiController::DATA min_id, PayloadBuilder* pb);
+
+void queue_byte(uint8_t min_id, uint8_t byte);
+void queue_byte(MobiController::DATA min_id, uint8_t byte);
 
 }  // namespace  USB_COM_PORT
 

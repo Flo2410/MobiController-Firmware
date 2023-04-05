@@ -20,6 +20,18 @@ void USB_COM_PORT::queue_payload(uint8_t min_id, PayloadBuilder *pb) {
   min_queue_frame(&min_ctx, min_id, pb->get_payload(), pb->size());
 }
 
+void USB_COM_PORT::queue_payload(MobiController::DATA min_id, PayloadBuilder *pb) {
+  queue_payload(static_cast<uint8_t>(min_id), pb);
+}
+
+void USB_COM_PORT::queue_byte(uint8_t min_id, uint8_t byte) {
+  min_queue_frame(&min_ctx, min_id, &byte, 1);
+}
+
+void USB_COM_PORT::queue_byte(MobiController::DATA min_id, uint8_t byte) {
+  queue_byte(static_cast<uint8_t>(min_id), byte);
+}
+
 //--------------------------------------------------------------------------------------------------------------
 // MIN Callback functions
 //--------------------------------------------------------------------------------------------------------------
