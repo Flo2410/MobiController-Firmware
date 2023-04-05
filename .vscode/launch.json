@@ -25,6 +25,34 @@
       "device": "stm32l452",
       "configFiles": ["openocd.cfg"],
       "svdFile": "STM32L4R5.svd"
+    },
+    {
+      "name": "STlink launch",
+      "cwd": "${workspaceRoot}",
+      "executable": "${workspaceRoot}/build/MobiController-Firmware.elf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "stutil",
+      "device": "",
+      "interface": "swd",
+      "runToEntryPoint": "main", // else it starts at reset handler - not interested
+      "preLaunchTask": "Build STM", // configured in tasks.json
+      "svdFile": "", // Include svd to watch device peripherals
+      "swoConfig": {
+        // "enabled": true,
+        // "cpuFrequency": 800000000,
+        // "swoFrequency": 4000000,
+        // "source": "probe",
+        // "decoders": [
+        //   {
+        //     "label": "ITM port 0 output",
+        //     "type": "console",
+        //     "port": 0,
+        //     "showOnStartup": true,
+        //     "encoding": "ascii"
+        //   }
+        // ]
+      } // currently (v1.7.0) not supported
     }
   ]
 }
