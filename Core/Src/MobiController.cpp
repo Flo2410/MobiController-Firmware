@@ -33,15 +33,15 @@ void MobiController::handle_command_queue() {
 
     switch (cmd.min_id) {
       case COMMANDS::TEMPERATURE: {
-        if (cmd.payload_length == 0) {
-          mobictl().queue_data_frame(MobiController::DATA::TEMPERATURE);
+        if (cmd.payload_length == 2) {
+          PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
+          uint16_t freq = pb->read_uint16();
+          printf("Freq: %d\n", freq);
+          // TODO: repeatedly send temp with freq
           break;
         }
 
-        PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
-        uint16_t freq = pb->read_uint16();
-        printf("Freq: %d\n", freq);
-        // TODO: repeatedly send temp with freq
+        mobictl().queue_data_frame(MobiController::DATA::TEMPERATURE);
         break;
       }
 
