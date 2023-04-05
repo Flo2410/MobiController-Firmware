@@ -2,6 +2,7 @@
 
 #include "usb_com_port.hpp"
 
+#include "cpp_main.hpp"
 #include "etl/string.h"
 #include "min.h"
 #include "stm32l4xx.h"
@@ -13,6 +14,10 @@ void USB_COM_PORT::send_str(etl::string<64> str) {
 
 void USB_COM_PORT::send_data(uint8_t *data, uint16_t len) {
   CDC_Transmit_FS(data, len);
+}
+
+void USB_COM_PORT::queue_payload(uint8_t min_id, PayloadBuilder *pb) {
+  min_queue_frame(&min_ctx, min_id, pb->get_payload(), pb->size());
 }
 
 //--------------------------------------------------------------------------------------------------------------

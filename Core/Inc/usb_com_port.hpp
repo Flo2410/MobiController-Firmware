@@ -1,5 +1,7 @@
 #ifndef USB_COM_PORT_H_
 #define USB_COM_PORT_H_
+
+#include "PayloadBuilder.hpp"
 #include "etl/queue.h"
 #include "etl/string.h"
 #include "stm32l4xx.h"
@@ -10,6 +12,8 @@ inline etl::queue<uint8_t, 265, etl::memory_model::MEMORY_MODEL_MEDIUM> tx_queue
 
 void send_str(etl::string<64> str);
 void send_data(uint8_t* data, uint16_t len);
+
+void queue_payload(uint8_t min_id, PayloadBuilder* pb);
 
 }  // namespace  USB_COM_PORT
 
