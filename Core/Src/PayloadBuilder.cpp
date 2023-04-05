@@ -5,6 +5,10 @@
 PayloadBuilder::PayloadBuilder() {
 }
 
+PayloadBuilder::PayloadBuilder(uint8_t const* bytes, uint8_t length) {
+  this->payload.insert(this->payload.begin(), bytes, bytes + length);
+}
+
 void PayloadBuilder::append_uint8(uint8_t number) {
   this->payload.push_back(number);
 }
@@ -31,6 +35,28 @@ void PayloadBuilder::append_double(double number) {
   uint8_t buffer[8];
   etl::mem_copy((uint8_t*)&number, 8, buffer);
   this->payload.insert(this->payload.end(), buffer, buffer + 8);
+}
+
+uint8_t PayloadBuilder::read_uint8() {
+  uint8_t number = this->payload.front();
+  this->payload.erase(this->payload.begin());
+  return number;
+}
+
+uint16_t PayloadBuilder::read_uint16() {
+  uint16_t number;
+  etl::mem_copy(this->payload.begin(), 2, (uint8_t*)&number);
+  this->payload.erase(this->payload.begin(), this->payload.begin() + 2);
+  return number;
+}
+
+uint32_t PayloadBuilder::read_uint32() {
+}
+
+float PayloadBuilder::read_float() {
+}
+
+double PayloadBuilder::read_double() {
 }
 
 uint8_t* PayloadBuilder::get_payload() {
