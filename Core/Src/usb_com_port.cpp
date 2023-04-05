@@ -2,6 +2,7 @@
 
 #include "usb_com_port.hpp"
 
+#include "c_bridge.h"
 #include "cpp_main.hpp"
 #include "etl/string.h"
 #include "min.h"
@@ -76,5 +77,9 @@ void min_debug_print(const char *msg, ...) {
 void min_application_handler(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload, uint8_t port) {
   // We ignore the port because we have one context, but we could use it to index an array of
   // contexts in a bigger application.
-  printf("MIN frame with ID 0x%02x, length = %d and data: %s\n", min_id, len_payload, (char *)min_payload);
+
+  // printf("MIN frame with ID 0x%02x, length = %d and data: %s\n", min_id, len_payload, (char *)min_payload);
+
+  // Handle Frames
+  mobictl_handle_commands(min_id, min_payload, len_payload);
 }
