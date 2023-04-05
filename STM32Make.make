@@ -150,12 +150,14 @@ AS_DEFS =
 
 # C defines
 C_DEFS =  \
+-DMOBI_DEBUG \
 -DSTM32L452xx \
 -DUSE_HAL_DRIVER
 
 
 # CXX defines
 CXX_DEFS =  \
+-DMOBI_DEBUG \
 -DSTM32L452xx \
 -DUSE_HAL_DRIVER
 

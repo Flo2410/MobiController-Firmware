@@ -16,6 +16,7 @@
         "USB_DEVICE/Target"
       ],
       "defines": [
+        "MOBI_DEBUG",
         "STM32L452xx",
         "USE_HAL_DRIVER"
       ],
