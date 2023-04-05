@@ -12,8 +12,6 @@ class MobiController {
     return instance;
   }
 
-  static void handle_commands(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload);
-
   // commands
   enum class COMMANDS {
     IMU = 0x20,
@@ -44,9 +42,20 @@ class MobiController {
     POZYX_CONFIG = 0x9,
   };
 
+  struct QueuedCommand {
+    COMMANDS min_id;
+    uint8_t const *payload;
+    uint8_t payload_length;
+  };
+
   Bno055 *imu;
 
   void loop();
+
+  void handle_command_queue();
+  void queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload);
+
+  void handle_data_frame_queue();
   void queue_data_frame(DATA data);
 
  private:
@@ -55,6 +64,7 @@ class MobiController {
   MobiController &operator=(const MobiController &) = delete;  // disable copy assignment operator
 
   etl::queue<DATA, 100> data_frame_queue;
+  etl::queue<QueuedCommand, 100> command_queue;
 };
 
 #endif
