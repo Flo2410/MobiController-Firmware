@@ -19,7 +19,7 @@
         "STM32L452xx",
         "USE_HAL_DRIVER"
       ],
-      "compilerPath": "/home/florian/stm32/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-g++"
+      "compilerPath": "/home/florian/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/12.2.1-1.2.1/.content/bin/arm-none-eabi-g++"
     }
   ],
   "version": 4
