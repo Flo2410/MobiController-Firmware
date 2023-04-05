@@ -17,9 +17,7 @@ int cpp_main() {
   printf("Copyright FHWN Florian Hye\n");
   printf("----------------------------------------\n\n");
 
-  MobiController *mobictl = new MobiController(&min_ctx);
-
   while (1) {
-    mobictl->loop();
+    MobiController::mobictl().loop();
   }
 }
