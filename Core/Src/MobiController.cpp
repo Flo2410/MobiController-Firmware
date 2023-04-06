@@ -22,7 +22,12 @@ void MobiController::loop() {
 }
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
-  // TODO: Check if min_id is a valid command
+  // Check that the recived id is a valid command.
+  if (min_id < 0x20 || min_id > 0x2B) {
+    debug_print("Recieved unkown command with ID: %d!\n", min_id);
+    return;
+  }
+
   QueuedCommand cmd = {
       .min_id = static_cast<COMMANDS>(min_id),
       .payload = min_payload,
