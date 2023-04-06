@@ -4,13 +4,17 @@
 #include "cpp_main.hpp"
 #include "i2c.h"
 #include "min.h"
+#include "stdarg.h"
 #include "stdio.h"
 #include "usb_com_port.hpp"
 
-void MobiController::debug_print(const char *msg, ...) {
+void MobiController::debug_print(const char *format, ...) {
 #ifdef MOBI_DEBUG
+  va_list args;
+  va_start(args, format);
   printf("MobiController: ");
-  printf(msg);
+  vprintf(format, args);
+  va_end(args);
 #endif
 }
 
@@ -24,7 +28,7 @@ void MobiController::loop() {
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
   // Check that the recived id is a valid command.
   if (min_id < 0x20 || min_id > 0x2B) {
-    debug_print("Recieved unkown command with ID: %d!\n", min_id);
+    debug_print("Recieved unkown command with ID: %#.2x!\n", min_id);
     return;
   }
 
@@ -43,7 +47,7 @@ void MobiController::handle_command_queue() {
     QueuedCommand cmd;
     this->command_queue.pop_into(cmd);
 
-    debug_print("Got command from queue with ID: %d\n", static_cast<uint8_t>(cmd.min_id));
+    debug_print("Got command from queue with ID: %#.2x\n", cmd.min_id);
 
     switch (cmd.min_id) {
       case COMMANDS::TEMPERATURE: {
