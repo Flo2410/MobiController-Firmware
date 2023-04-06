@@ -12,6 +12,8 @@ class MobiController {
     return instance;
   }
 
+  static void debug_print(const char *msg, ...);
+
   // commands
   enum class COMMANDS {
     IMU = 0x20,

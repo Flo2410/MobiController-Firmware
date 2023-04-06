@@ -7,6 +7,13 @@
 #include "stdio.h"
 #include "usb_com_port.hpp"
 
+void MobiController::debug_print(const char *msg, ...) {
+#ifdef MOBI_DEBUG
+  printf("MobiController: ");
+  printf(msg);
+#endif
+}
+
 void MobiController::loop() {
   min_poll(&min_ctx, {}, 0);
 
@@ -31,9 +38,7 @@ void MobiController::handle_command_queue() {
     QueuedCommand cmd;
     this->command_queue.pop_into(cmd);
 
-#ifdef MOBI_DEBUG
-    printf("Got command from queue with ID: %d\n", static_cast<uint8_t>(cmd.min_id));
-#endif
+    debug_print("Got command from queue with ID: %d\n", static_cast<uint8_t>(cmd.min_id));
 
     switch (cmd.min_id) {
       case COMMANDS::TEMPERATURE: {
@@ -50,9 +55,7 @@ void MobiController::handle_command_queue() {
       }
 
       default:
-#ifdef MOBI_DEBUG
-        printf("MobiController: recieved unkown command!\n");
-#endif
+        debug_print("Queued unkown command!\n");
         break;
     }
   }
@@ -69,10 +72,7 @@ void MobiController::handle_data_frame_queue() {
 
     DATA data;
     this->data_frame_queue.pop_into(data);
-
-#ifdef MOBI_DEBUG
-    printf("Got item from data queue with ID: %d\n", static_cast<uint8_t>(data));
-#endif
+    debug_print("Got item from data queue with ID: %d\n", static_cast<uint8_t>(data));
 
     switch (data) {
       case DATA::TEMPERATURE:
