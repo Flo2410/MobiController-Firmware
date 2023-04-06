@@ -21,6 +21,7 @@ void MobiController::debug_print(const char *format, ...) {
 void MobiController::loop() {
   min_poll(&min_ctx, {}, 0);
 
+  this->handle_periodic_update();
   this->handle_command_queue();
   this->handle_data_frame_queue();
 }
@@ -39,6 +40,95 @@ void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, u
   this->command_queue.push(cmd);
 }
 
+void MobiController::queue_data_frame(SubDevice sub_device) {
+  this->data_frame_queue.push(sub_device);
+}
+
+void MobiController::queue_data_frame(DATA data, uint8_t sub_device_mask) {
+  SubDevice sub_device = {
+      .min_id = data,
+      .sub_device_mask = sub_device_mask,
+  };
+  this->queue_data_frame(sub_device);
+}
+
+void MobiController::enable_periodic_update(SubDevice sub_device, uint16_t interval) {
+  PeriodicUpdate periodic_update = {
+      .sub_device = sub_device,
+      .interval = interval,
+  };
+  this->periodic_updates.push_back(periodic_update);
+}
+void MobiController::enable_periodic_update(DATA data, uint16_t interval) {
+  SubDevice sub_device = {
+      .min_id = data,
+      .sub_device_mask = 0,
+  };
+  this->enable_periodic_update(sub_device, interval);
+}
+
+void MobiController::disable_periodic_update(SubDevice sub_device) {
+  for (PeriodicUpdate *it = this->periodic_updates.begin(); it < this->periodic_updates.end(); ++it) {
+    if (it->sub_device.min_id == sub_device.min_id && it->sub_device.sub_device_mask == sub_device.sub_device_mask) this->periodic_updates.erase(it);
+  }
+}
+
+void MobiController::disable_periodic_update(DATA data) {
+  SubDevice sub_device = {
+      .min_id = data,
+      .sub_device_mask = 0,
+  };
+  this->disable_periodic_update(sub_device);
+}
+
+void MobiController::disable_periodic_update_if_enabled(SubDevice sub_device) {
+  if (this->is_periodic_update_enabled(sub_device))
+    this->disable_periodic_update(sub_device);
+}
+
+void MobiController::disable_periodic_update_if_enabled(DATA data) {
+  if (this->is_periodic_update_enabled(data))
+    this->disable_periodic_update(data);
+}
+
+bool MobiController::is_periodic_update_enabled(SubDevice sub_device) {
+  for (PeriodicUpdate *it = this->periodic_updates.begin(); it < this->periodic_updates.end(); ++it) {
+    if (it->sub_device.min_id == sub_device.min_id && it->sub_device.sub_device_mask == sub_device.sub_device_mask) return true;
+  }
+  return false;
+}
+
+bool MobiController::is_periodic_update_enabled(DATA data) {
+  SubDevice sub_device = {
+      .min_id = data,
+      .sub_device_mask = 0,
+  };
+  return this->is_periodic_update_enabled(sub_device);
+}
+
+// -------------------------------------------------------------------------------------------------------
+// Private
+// -------------------------------------------------------------------------------------------------------
+
+MobiController::MobiController() {
+  min_init_context(&min_ctx, 0);
+  this->imu = new Bno055(&hi2c1);
+}
+
+void MobiController::handle_periodic_update() {
+  uint32_t time_now_ms = HAL_GetTick();
+
+  for (PeriodicUpdate *it = this->periodic_updates.begin(); it < this->periodic_updates.end(); ++it) {
+    // Check if should be sent
+    if (time_now_ms >= it->last_sent_ms + it->interval) {
+      debug_print("Sending periodic update of ID: %#.2x\n", it->sub_device.min_id);
+
+      it->last_sent_ms = time_now_ms;
+      this->queue_data_frame(DATA::TEMPERATURE);
+    }
+  }
+}
+
 void MobiController::handle_command_queue() {
   // Allow for the processing of 10 commands
   for (size_t i = 0; i < 10; i++) {
@@ -54,14 +144,17 @@ void MobiController::handle_command_queue() {
         if (cmd.payload_length == 2) {
           PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
           uint16_t freq = pb->read_uint16();
-          printf("Freq: %d\n", freq);
-          // TODO: repeatedly send temp with freq
+          this->enable_periodic_update(DATA::TEMPERATURE, freq);
           break;
         }
 
-        mobictl().queue_data_frame(MobiController::DATA::TEMPERATURE);
+        // Disable periodic update if the temp is read
+        this->disable_periodic_update_if_enabled(DATA::TEMPERATURE);
+        this->queue_data_frame(DATA::TEMPERATURE);
         break;
       }
+
+        // TODO: Handle all other commands
 
       default:
         debug_print("Queued unkown command!\n");
@@ -70,31 +163,22 @@ void MobiController::handle_command_queue() {
   }
 }
 
-void MobiController::queue_data_frame(DATA data) {
-  this->data_frame_queue.push(data);
-}
-
 void MobiController::handle_data_frame_queue() {
   // Allow for the processing of 10 data frames
   for (size_t i = 0; i < 10; i++) {
     if (this->data_frame_queue.size() == 0) return;
+    SubDevice sub_device;
+    this->data_frame_queue.pop_into(sub_device);
 
-    DATA data;
-    this->data_frame_queue.pop_into(data);
-    debug_print("Got item from data queue with ID: %d\n", static_cast<uint8_t>(data));
+    debug_print("Got item from data queue with ID: %#.2x\n", static_cast<uint8_t>(sub_device.min_id));
 
-    switch (data) {
+    switch (sub_device.min_id) {
       case DATA::TEMPERATURE:
         USB_COM_PORT::queue_byte(DATA::TEMPERATURE, this->imu->get_temp());
         break;
-
+        // TODO: Read all other sensors
       default:
         break;
     }
   }
-}
-
-MobiController::MobiController() {
-  min_init_context(&min_ctx, 0);
-  this->imu = new Bno055(&hi2c1);
 }
