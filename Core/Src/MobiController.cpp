@@ -151,7 +151,7 @@ void MobiController::handle_command_queue() {
         if (cmd.payload_length == 2) {
           PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
           uint16_t freq = pb->read_uint16();
-          this->enable_periodic_update(DATA::TEMPERATURE, freq);
+          this->enable_periodic_update_if_disabled(DATA::TEMPERATURE, freq);
           break;
         }
 
