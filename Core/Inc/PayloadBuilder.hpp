@@ -1,6 +1,7 @@
 #ifndef PAYLOAD_BUILDER_H_
 #define PAYLOAD_BUILDER_H_
 
+#include "Bno055.hpp"
 #include "etl/vector.h"
 
 class PayloadBuilder {
@@ -14,6 +15,7 @@ class PayloadBuilder {
   void append_uint32(uint32_t number);
   void append_float(float number);
   void append_double(double number);
+  void append_vector(Bno055::vector_t vec);
 
   uint8_t read_uint8();
   uint16_t read_uint16();

@@ -37,6 +37,13 @@ void PayloadBuilder::append_double(double number) {
   this->payload.insert(this->payload.end(), buffer, buffer + 8);
 }
 
+void PayloadBuilder::append_vector(Bno055::vector_t vec) {
+  this->append_double(vec.w);
+  this->append_double(vec.x);
+  this->append_double(vec.y);
+  this->append_double(vec.z);
+}
+
 uint8_t PayloadBuilder::read_uint8() {
   uint8_t number = this->payload.front();
   this->payload.erase(this->payload.begin());
