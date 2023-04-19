@@ -123,7 +123,7 @@ etl::vector<uint8_t, 8> MobiController::extract_subdevices_from_byte(uint8_t byt
   for (size_t i = 0; i < 8; i++) {
     // extract subdevice ids
     uint8_t current_mask = 0x01 << i;
-    if (byte & current_mask == current_mask)
+    if ((byte & current_mask) == current_mask)
       sub_devices.push_back(current_mask);
   }
 
