@@ -116,6 +116,9 @@ class MobiController {
   void disable_periodic_update(SubDevice sub_device);
   void disable_periodic_update(DATA data);
 
+  void enable_periodic_update_if_disabled(SubDevice sub_device, uint16_t interval);
+  void enable_periodic_update_if_disabled(DATA data, uint16_t interval);
+
   void disable_periodic_update_if_enabled(SubDevice sub_device);
   void disable_periodic_update_if_enabled(DATA data);
 

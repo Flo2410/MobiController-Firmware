@@ -81,6 +81,13 @@ void MobiController::disable_periodic_update(DATA data) {
   this->disable_periodic_update(sub_device);
 }
 
+void MobiController::enable_periodic_update_if_disabled(SubDevice sub_device, uint16_t interval) {
+  if (!this->is_periodic_update_enabled(sub_device)) this->enable_periodic_update(sub_device, interval);
+}
+void MobiController::enable_periodic_update_if_disabled(DATA data, uint16_t interval) {
+  if (!this->is_periodic_update_enabled(data)) this->enable_periodic_update(data, interval);
+}
+
 void MobiController::disable_periodic_update_if_enabled(SubDevice sub_device) {
   if (this->is_periodic_update_enabled(sub_device))
     this->disable_periodic_update(sub_device);
