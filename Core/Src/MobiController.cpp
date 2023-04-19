@@ -117,6 +117,19 @@ bool MobiController::is_periodic_update_enabled(DATA data) {
 // Private
 // -------------------------------------------------------------------------------------------------------
 
+etl::vector<uint8_t, 8> MobiController::extract_subdevices_from_byte(uint8_t byte) {
+  etl::vector<uint8_t, 8> sub_devices;
+
+  for (size_t i = 0; i < 8; i++) {
+    // extract subdevice ids
+    uint8_t current_mask = 0x01 << i;
+    if (byte & current_mask == current_mask)
+      sub_devices.push_back(current_mask);
+  }
+
+  return sub_devices;
+}
+
 MobiController::MobiController() {
   min_init_context(&min_ctx, 0);
   this->imu = new Bno055(&hi2c1);

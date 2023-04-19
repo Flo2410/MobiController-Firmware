@@ -126,6 +126,8 @@ class MobiController {
   bool is_periodic_update_enabled(DATA data);
 
  private:
+  static etl::vector<uint8_t, 8> extract_subdevices_from_byte(uint8_t byte);
+
   MobiController();                                            // private constructor
   MobiController(const MobiController &) = delete;             // disable copy constructor
   MobiController &operator=(const MobiController &) = delete;  // disable copy assignment operator
