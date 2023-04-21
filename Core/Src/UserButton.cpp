@@ -1,8 +1,10 @@
+#include "MobiController.hpp"
 #include "UserButtton.hpp"
 #include "etl/algorithm.h"
 #include "gpio.h"
 #include "stdio.h"
 #include "stm32l452xx.h"
+#include "usb_com_port.hpp"
 
 void UserButtton::handle_interrupts(uint16_t GPIO_Pin) {
   for (auto it_sensor = UserButtton::all_buttons.begin(); it_sensor != UserButtton::all_buttons.end(); ++it_sensor) {
@@ -43,5 +45,7 @@ void UserButtton::handle_interrupt(uint16_t GPIO_Pin) {
     } else {
       printf("Pressed\n");
     }
+  } else if (this->get_mode() == MODE::EXTERNAL) {
+    USB_COM_PORT::queue_byte(MobiController::DATA::USER_BUTTON, !this->state);
   }
 }

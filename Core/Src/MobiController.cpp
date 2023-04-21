@@ -208,7 +208,26 @@ void MobiController::handle_command_queue() {
         this->queue_data_frame(DATA::TEMPERATURE);
         break;
       }
+      case COMMANDS::USER_BUTTON: {
+        if (cmd.payload_length > 1) {
+          // TODO: send error
+          break;
+        }
 
+        if (cmd.payload_length == 1) {
+          // Set the recived mode
+          UserButtton::MODE mode = static_cast<UserButtton::MODE>(cmd.payload[0]);
+          this->user_btn->set_mode(mode);
+        } else {
+          // Toggle the mode
+          auto current_mode = this->user_btn->get_mode();
+          if (current_mode == UserButtton::MODE::EXTERNAL)
+            this->user_btn->set_mode(UserButtton::MODE::INTERNAL);
+          else if (current_mode == UserButtton::MODE::INTERNAL)
+            this->user_btn->set_mode(UserButtton::MODE::EXTERNAL);
+        }
+        break;
+      }
         // TODO: Handle all other commands
 
       default:
