@@ -2,6 +2,7 @@
 
 #include "Bno055.hpp"
 #include "cpp_main.hpp"
+#include "etl/vector.h"
 #include "i2c.h"
 #include "min.h"
 #include "stdarg.h"
@@ -160,10 +161,40 @@ void MobiController::handle_command_queue() {
     debug_print("Got command from queue with ID: %#.2x\n", cmd.min_id);
 
     switch (cmd.min_id) {
+      case COMMANDS::IMU: {
+        if (cmd.payload_length == 0 || cmd.payload[0] == 0 || (cmd.payload[0] | 0b01111111) == 0xff) {
+          debug_print("Got invalid IMU subdevice!\n");
+          // TODO: Send back an error
+          break;
+        }
+
+        // Check which sub devices
+        auto sub_device_masks = extract_subdevices_from_byte(cmd.payload[0]);
+
+        // Go through all subdevices
+        for (auto it = sub_device_masks.begin(); it < sub_device_masks.end(); ++it) {
+          SubDevice sub_device = {.min_id = DATA::IMU,
+                                  .sub_device_mask = *it};
+
+          if (cmd.payload_length == 3) {
+            PayloadBuilder *pb = new PayloadBuilder(cmd.payload + 1, cmd.payload_length - 1);  // Payload builder without first byte
+            uint16_t freq = pb->read_uint16();
+            this->enable_periodic_update_if_disabled(sub_device, freq);
+            continue;
+          }
+
+          this->disable_periodic_update_if_enabled(sub_device);
+          this->queue_data_frame(sub_device);
+        }
+
+        break;
+      }
+
       case COMMANDS::TEMPERATURE: {
         if (cmd.payload_length == 2) {
           PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
           uint16_t freq = pb->read_uint16();
+          delete pb;
           this->enable_periodic_update_if_disabled(DATA::TEMPERATURE, freq);
           break;
         }
@@ -193,6 +224,45 @@ void MobiController::handle_data_frame_queue() {
     debug_print("Got item from data queue with ID: %#.2x\n", static_cast<uint8_t>(sub_device.min_id));
 
     switch (sub_device.min_id) {
+      case DATA::IMU: {
+        PayloadBuilder *pb = new PayloadBuilder();  // Create a pb for the imu data
+        pb->append_uint8(sub_device.sub_device_mask);
+
+        switch (static_cast<IMU_SUB_DEVICES>(sub_device.sub_device_mask)) {
+          case IMU_SUB_DEVICES::ACCELEROMETER: {
+            pb->append_vector(this->imu->get_vector_accelerometer());  // Read the accel value from the imu and append it to the pb
+            break;
+          }
+          case IMU_SUB_DEVICES::MAGNETOMETER: {
+            pb->append_vector(this->imu->get_vector_magnetometer());
+            break;
+          }
+          case IMU_SUB_DEVICES::GYROSCOPE: {
+            pb->append_vector(this->imu->get_vector_gyroscope());
+            break;
+          }
+          case IMU_SUB_DEVICES::EULER: {
+            pb->append_vector(this->imu->get_vector_euler());
+            break;
+          }
+          case IMU_SUB_DEVICES::LINEAR_ACCEL: {
+            pb->append_vector(this->imu->get_vector_linear_accel());
+            break;
+          }
+          case IMU_SUB_DEVICES::GRAVITY: {
+            pb->append_vector(this->imu->get_vector_gravity());
+            break;
+          }
+          case IMU_SUB_DEVICES::QUATERNION: {
+            pb->append_vector(this->imu->get_vector_quaternion());
+            break;
+          }
+        }
+
+        USB_COM_PORT::queue_payload(DATA::IMU, pb);  // queue the payload as a min frame
+        delete pb;
+        break;
+      }
       case DATA::TEMPERATURE:
         USB_COM_PORT::queue_byte(DATA::TEMPERATURE, this->imu->get_temp());
         break;
