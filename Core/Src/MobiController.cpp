@@ -144,7 +144,7 @@ void MobiController::handle_periodic_update() {
       debug_print("Sending periodic update of ID: %#.2x\n", it->sub_device.min_id);
 
       it->last_sent_ms = time_now_ms;
-      this->queue_data_frame(DATA::TEMPERATURE);
+      this->queue_data_frame(it->sub_device);
     }
   }
 }
