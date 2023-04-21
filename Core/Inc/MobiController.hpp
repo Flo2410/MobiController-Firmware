@@ -2,6 +2,7 @@
 #define MOBI_CONTROLLER_H_
 
 #include "Bno055.hpp"
+#include "UserButtton.hpp"
 #include "etl/queue.h"
 #include "etl/vector.h"
 #include "min.h"
@@ -101,7 +102,9 @@ class MobiController {
     uint32_t last_sent_ms = 0;
   };
 
+  // Devices
   Bno055 *imu;
+  UserButtton *user_btn;
 
   void loop();
 

@@ -1,5 +1,6 @@
 #include "interrupts.hpp"
 
+#include "UserButtton.hpp"
 #include "adc.h"
 #include "encoder.hpp"
 #include "gpio.h"
@@ -7,8 +8,6 @@
 #include "led_strip.hpp"
 #include "stdio.h"
 #include "stm32l4xx.h"
-
-bool mosfet_power = false;
 
 // Input Capture Interrupt
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim) {
@@ -18,24 +17,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim) {
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   Encoder::handle_interrupts(GPIO_Pin);
-
-  if (GPIO_Pin == USER_BTN_Pin) {
-    printf("User BTN pressed!\n");
-
-    mosfet_power = HAL_GPIO_ReadPin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_LED_STRIP_Pin);
-
-    if (mosfet_power) {
-      printf("Mosfet OFF\n");
-      HAL_GPIO_WritePin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_LED_STRIP_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin, GPIO_PIN_RESET);
-      // mosfet_power = false;
-    } else {
-      printf("Mosfet ON\n");
-      HAL_GPIO_WritePin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_LED_STRIP_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin, GPIO_PIN_SET);
-      // mosfet_power = true;
-    }
-  }
+  UserButtton::handle_interrupts(GPIO_Pin);
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {

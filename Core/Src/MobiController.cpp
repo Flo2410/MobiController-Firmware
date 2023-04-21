@@ -1,6 +1,7 @@
 #include "MobiController.hpp"
 
 #include "Bno055.hpp"
+#include "UserButtton.hpp"
 #include "cpp_main.hpp"
 #include "etl/vector.h"
 #include "i2c.h"
@@ -132,8 +133,11 @@ etl::vector<uint8_t, 8> MobiController::extract_subdevices_from_byte(uint8_t byt
 }
 
 MobiController::MobiController() {
-  min_init_context(&min_ctx, 0);
+  min_init_context(&min_ctx, 0);  // Init min proto
+
+  // Init all devices
   this->imu = new Bno055(&hi2c1);
+  this->user_btn = new UserButtton(USER_BTN_GPIO_Port, USER_BTN_Pin);
 }
 
 void MobiController::handle_periodic_update() {
