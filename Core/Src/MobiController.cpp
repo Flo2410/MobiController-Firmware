@@ -169,6 +169,10 @@ void MobiController::handle_basic_command(QueuedCommand cmd, DATA data) {
   this->queue_data_frame(data);
 }
 
+void MobiController::send_status(STATUS status) {
+  USB_COM_PORT::queue_byte(0, static_cast<uint8_t>(status));
+}
+
 void MobiController::handle_periodic_update() {
   uint32_t time_now_ms = HAL_GetTick();
 
@@ -197,7 +201,7 @@ void MobiController::handle_command_queue() {
       case COMMANDS::IMU: {
         if (cmd.payload_length == 0 || cmd.payload[0] == 0 || (cmd.payload[0] | 0b01111111) == 0xff) {
           debug_print("Got invalid IMU subdevice!\n");
-          // TODO: Send back an error
+          this->send_status(STATUS::INVALID_PARAMETER);
           break;
         }
 
@@ -238,7 +242,7 @@ void MobiController::handle_command_queue() {
       }
       case COMMANDS::USER_BUTTON: {
         if (cmd.payload_length > 1) {
-          // TODO: send error
+          this->send_status(STATUS::INVALID_PARAMETER);
           break;
         }
 
@@ -254,6 +258,8 @@ void MobiController::handle_command_queue() {
           else if (current_mode == UserButtton::MODE::INTERNAL)
             this->user_btn->set_mode(UserButtton::MODE::EXTERNAL);
         }
+
+        this->send_status(STATUS::OK);
         break;
       }
         // TODO: Handle all other commands

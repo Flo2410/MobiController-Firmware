@@ -17,6 +17,12 @@ class MobiController {
 
   static void debug_print(const char *msg, ...);
 
+  enum class STATUS {
+    OK = 0,
+    ERROR,
+    INVALID_PARAMETER,
+  };
+
   // commands
   enum class COMMANDS {
     IMU = 0x20,
@@ -142,6 +148,7 @@ class MobiController {
   etl::vector<PeriodicUpdate, 20> periodic_updates;
 
   void handle_basic_command(QueuedCommand cmd, DATA data);
+  void send_status(STATUS status);
 
   void handle_periodic_update();
   void handle_command_queue();
