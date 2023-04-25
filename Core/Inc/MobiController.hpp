@@ -141,6 +141,8 @@ class MobiController {
   etl::queue<QueuedCommand, 100> command_queue;
   etl::vector<PeriodicUpdate, 20> periodic_updates;
 
+  void handle_basic_command(QueuedCommand cmd, DATA data);
+
   void handle_periodic_update();
   void handle_command_queue();
   void handle_data_frame_queue();

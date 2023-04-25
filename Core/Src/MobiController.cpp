@@ -154,6 +154,20 @@ MobiController::MobiController() {
   this->light_sensor = new BH1750(&hi2c1, BH1750::DEFAULT_ADDRESS);
 }
 
+void MobiController::handle_basic_command(QueuedCommand cmd, DATA data) {
+  if (cmd.payload_length == 2) {
+    PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
+    uint16_t freq = pb->read_uint16();
+    delete pb;
+    this->enable_periodic_update_if_disabled(data, freq);
+    return;
+  }
+
+  // Disable periodic update if read without frequency
+  this->disable_periodic_update_if_enabled(data);
+  this->queue_data_frame(data);
+}
+
 void MobiController::handle_periodic_update() {
   uint32_t time_now_ms = HAL_GetTick();
 
@@ -209,32 +223,12 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::BRIGHTNESS: {
-        if (cmd.payload_length == 2) {
-          PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
-          uint16_t freq = pb->read_uint16();
-          delete pb;
-          this->enable_periodic_update_if_disabled(DATA::BRIGHTNESS, freq);
-          break;
-        }
-
-        // Disable periodic update if read without frequency
-        this->disable_periodic_update_if_enabled(DATA::BRIGHTNESS);
-        this->queue_data_frame(DATA::BRIGHTNESS);
+        this->handle_basic_command(cmd, DATA::BRIGHTNESS);
         break;
       }
 
       case COMMANDS::TEMPERATURE: {
-        if (cmd.payload_length == 2) {
-          PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
-          uint16_t freq = pb->read_uint16();
-          delete pb;
-          this->enable_periodic_update_if_disabled(DATA::TEMPERATURE, freq);
-          break;
-        }
-
-        // Disable periodic update if the temp is read
-        this->disable_periodic_update_if_enabled(DATA::TEMPERATURE);
-        this->queue_data_frame(DATA::TEMPERATURE);
+        this->handle_basic_command(cmd, DATA::TEMPERATURE);
         break;
       }
       case COMMANDS::USER_BUTTON: {
