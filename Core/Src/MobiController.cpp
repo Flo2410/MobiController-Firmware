@@ -23,6 +23,15 @@ void MobiController::debug_print(const char *format, ...) {
 #endif
 }
 
+void MobiController::setup() {
+  // Turn off the power for the led strip and pozyx
+  HAL_GPIO_WritePin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_LED_STRIP_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin, GPIO_PIN_SET);
+
+  // Calibrate ADC
+  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+}
+
 void MobiController::loop() {
   min_poll(&min_ctx, {}, 0);
 

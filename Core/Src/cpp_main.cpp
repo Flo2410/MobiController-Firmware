@@ -18,6 +18,8 @@ int cpp_main() {
   printf("Copyright FHWN Florian Hye\n");
   printf("---------------------------------------------\n\n");
 
+  MobiController::mobictl().setup();
+
   while (1) {
     MobiController::mobictl().loop();
   }

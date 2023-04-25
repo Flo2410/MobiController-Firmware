@@ -122,6 +122,7 @@ class MobiController {
   HCSR04 *ultrasonic_sensor_5;
   HCSR04 *ultrasonic_sensor_6;
 
+  void setup();
   void loop();
 
   void queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload);
