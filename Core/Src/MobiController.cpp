@@ -276,6 +276,7 @@ void MobiController::handle_command_queue() {
 
       case COMMANDS::USER_BUTTON: {
         if (cmd.payload_length > 1) {
+          debug_print("Got invalid parameter for user button!\n");
           this->send_status(STATUS::INVALID_PARAMETER);
           break;
         }
