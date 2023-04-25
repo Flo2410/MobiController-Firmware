@@ -2,6 +2,7 @@
 
 #include "Bno055.hpp"
 #include "UserButtton.hpp"
+#include "bh1750.hpp"
 #include "cpp_main.hpp"
 #include "etl/vector.h"
 #include "i2c.h"
@@ -138,6 +139,7 @@ MobiController::MobiController() {
   // Init all devices
   this->imu = new Bno055(&hi2c1);
   this->user_btn = new UserButtton(USER_BTN_GPIO_Port, USER_BTN_Pin);
+  this->light_sensor = new BH1750(&hi2c1, BH1750::DEFAULT_ADDRESS);
 }
 
 void MobiController::handle_periodic_update() {
@@ -191,6 +193,21 @@ void MobiController::handle_command_queue() {
           this->queue_data_frame(sub_device);
         }
 
+        break;
+      }
+
+      case COMMANDS::BRIGHTNESS: {
+        if (cmd.payload_length == 2) {
+          PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
+          uint16_t freq = pb->read_uint16();
+          delete pb;
+          this->enable_periodic_update_if_disabled(DATA::BRIGHTNESS, freq);
+          break;
+        }
+
+        // Disable periodic update if read without frequency
+        this->disable_periodic_update_if_enabled(DATA::BRIGHTNESS);
+        this->queue_data_frame(DATA::BRIGHTNESS);
         break;
       }
 
@@ -283,6 +300,13 @@ void MobiController::handle_data_frame_queue() {
         }
 
         USB_COM_PORT::queue_payload(DATA::IMU, pb);  // queue the payload as a min frame
+        delete pb;
+        break;
+      }
+      case DATA::BRIGHTNESS: {
+        PayloadBuilder *pb = new PayloadBuilder();
+        pb->append_float(this->light_sensor->read_light());
+        USB_COM_PORT::queue_payload(DATA::BRIGHTNESS, pb);
         delete pb;
         break;
       }

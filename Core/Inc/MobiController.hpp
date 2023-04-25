@@ -3,6 +3,7 @@
 
 #include "Bno055.hpp"
 #include "UserButtton.hpp"
+#include "bh1750.hpp"
 #include "etl/queue.h"
 #include "etl/vector.h"
 #include "min.h"
@@ -105,6 +106,7 @@ class MobiController {
   // Devices
   Bno055 *imu;
   UserButtton *user_btn;
+  BH1750 *light_sensor;
 
   void loop();
 
