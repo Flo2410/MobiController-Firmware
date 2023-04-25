@@ -34,6 +34,7 @@ void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, u
   // Check that the recived id is a valid command.
   if (min_id < 0x20 || min_id > 0x2B) {
     debug_print("Recieved unkown command with ID: %#.2x!\n", min_id);
+    this->send_status(STATUS::UNKOWN_COMMAND);
     return;
   }
 

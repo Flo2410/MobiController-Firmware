@@ -21,6 +21,7 @@ class MobiController {
     OK = 0,
     ERROR,
     INVALID_PARAMETER,
+    UNKOWN_COMMAND,
   };
 
   // commands
