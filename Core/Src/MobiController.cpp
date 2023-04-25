@@ -2,6 +2,7 @@
 
 #include "Bno055.hpp"
 #include "UserButtton.hpp"
+#include "adc.h"
 #include "bh1750.hpp"
 #include "cpp_main.hpp"
 #include "etl/vector.h"
@@ -231,6 +232,10 @@ void MobiController::handle_command_queue() {
         this->handle_basic_command(cmd, DATA::TEMPERATURE);
         break;
       }
+      case COMMANDS::BAT_VOLTAGE: {
+        this->handle_basic_command(cmd, DATA::BAT_VOLTAGE);
+        break;
+      }
       case COMMANDS::USER_BUTTON: {
         if (cmd.payload_length > 1) {
           // TODO: send error
@@ -319,6 +324,16 @@ void MobiController::handle_data_frame_queue() {
       case DATA::TEMPERATURE:
         USB_COM_PORT::queue_byte(DATA::TEMPERATURE, this->imu->get_temp());
         break;
+      case DATA::BAT_VOLTAGE: {
+        HAL_ADC_Start(&hadc1);  // Start ADC
+        HAL_ADC_PollForConversion(&hadc1, 1);
+        float U = __LL_ADC_CALC_DATA_TO_VOLTAGE(3300UL, HAL_ADC_GetValue(&hadc1), LL_ADC_RESOLUTION_12B) * 0.001;
+        PayloadBuilder *pb = new PayloadBuilder();
+        pb->append_float(U);
+        USB_COM_PORT::queue_payload(DATA::BAT_VOLTAGE, pb);
+        delete pb;
+        break;
+      }
         // TODO: Read all other sensors
       default:
         break;
