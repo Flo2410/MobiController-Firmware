@@ -6,6 +6,7 @@
 #include "bh1750.hpp"
 #include "etl/queue.h"
 #include "etl/vector.h"
+#include "hcsr04.hpp"
 #include "min.h"
 
 class MobiController {
@@ -114,6 +115,12 @@ class MobiController {
   Bno055 *imu;
   UserButtton *user_btn;
   BH1750 *light_sensor;
+  HCSR04 *ultrasonic_sensor_1;
+  HCSR04 *ultrasonic_sensor_2;
+  HCSR04 *ultrasonic_sensor_3;
+  HCSR04 *ultrasonic_sensor_4;
+  HCSR04 *ultrasonic_sensor_5;
+  HCSR04 *ultrasonic_sensor_6;
 
   void loop();
 

@@ -14,7 +14,7 @@ class HCSR04 {
   HCSR04(TIM_HandleTypeDef *htim, TIM_Channel_Struct channel, GPIO_TypeDef *gpio_trig_port, uint16_t gpio_trig_pin);
 
   void read(void);
-  float get_distance(void); 
+  float get_distance(void);
 
  private:
   TIM_HandleTypeDef *htim;

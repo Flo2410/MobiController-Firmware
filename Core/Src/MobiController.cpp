@@ -6,6 +6,7 @@
 #include "bh1750.hpp"
 #include "cpp_main.hpp"
 #include "etl/vector.h"
+#include "hcsr04.hpp"
 #include "i2c.h"
 #include "min.h"
 #include "stdarg.h"
@@ -154,6 +155,12 @@ MobiController::MobiController() {
   this->imu = new Bno055(&hi2c1);
   this->user_btn = new UserButtton(USER_BTN_GPIO_Port, USER_BTN_Pin);
   this->light_sensor = new BH1750(&hi2c1, BH1750::DEFAULT_ADDRESS);
+  this->ultrasonic_sensor_1 = new HCSR04(&htim1, TIM_Channel_1, TRIG_1_GPIO_Port, TRIG_1_Pin);
+  this->ultrasonic_sensor_2 = new HCSR04(&htim2, TIM_Channel_3, TRIG_2_GPIO_Port, TRIG_2_Pin);
+  this->ultrasonic_sensor_3 = new HCSR04(&htim1, TIM_Channel_2, TRIG_3_GPIO_Port, TRIG_3_Pin);
+  this->ultrasonic_sensor_4 = new HCSR04(&htim2, TIM_Channel_1, TRIG_4_GPIO_Port, TRIG_4_Pin);
+  this->ultrasonic_sensor_5 = new HCSR04(&htim2, TIM_Channel_4, TRIG_5_GPIO_Port, TRIG_5_Pin);
+  this->ultrasonic_sensor_6 = new HCSR04(&htim2, TIM_Channel_2, TRIG_6_GPIO_Port, TRIG_6_Pin);
 }
 
 void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
@@ -229,6 +236,17 @@ void MobiController::handle_command_queue() {
         }
 
         this->handle_advanced_command(cmd, DATA::IMU);
+        break;
+      }
+
+      case COMMANDS::ULTRASONIC_SENSOR: {
+        if (cmd.payload_length == 0 || cmd.payload[0] == 0 || (cmd.payload[0] & 0x80) != 0 || (cmd.payload[0] & 0x40) != 0) {
+          debug_print("Got invalid ultrasonic sensor subdevice!\n");
+          this->send_status(STATUS::INVALID_PARAMETER);
+          break;
+        }
+
+        this->handle_advanced_command(cmd, DATA::ULTRASONIC_SENSOR);
         break;
       }
 
@@ -327,6 +345,60 @@ void MobiController::handle_data_frame_queue() {
         delete pb;
         break;
       }
+
+      case DATA::ULTRASONIC_SENSOR: {
+        PayloadBuilder *pb = new PayloadBuilder();
+        pb->append_uint8(sub_device.sub_device_mask);
+
+        switch (static_cast<ULTRASONIC_SENSOR_SUB_DEVICES>(sub_device.sub_device_mask)) {
+          case ULTRASONIC_SENSOR_SUB_DEVICES::US_1: {
+            this->ultrasonic_sensor_1->read();
+            HAL_Delay(10);
+            pb->append_float(this->ultrasonic_sensor_1->get_distance());
+            break;
+          }
+
+          case ULTRASONIC_SENSOR_SUB_DEVICES::US_2: {
+            this->ultrasonic_sensor_2->read();
+            HAL_Delay(10);
+            pb->append_float(this->ultrasonic_sensor_2->get_distance());
+            break;
+          }
+
+          case ULTRASONIC_SENSOR_SUB_DEVICES::US_3: {
+            this->ultrasonic_sensor_3->read();
+            HAL_Delay(10);
+            pb->append_float(this->ultrasonic_sensor_3->get_distance());
+            break;
+          }
+
+          case ULTRASONIC_SENSOR_SUB_DEVICES::US_4: {
+            this->ultrasonic_sensor_4->read();
+            HAL_Delay(10);
+            pb->append_float(this->ultrasonic_sensor_4->get_distance());
+            break;
+          }
+
+          case ULTRASONIC_SENSOR_SUB_DEVICES::US_5: {
+            this->ultrasonic_sensor_5->read();
+            HAL_Delay(10);
+            pb->append_float(this->ultrasonic_sensor_5->get_distance());
+            break;
+          }
+
+          case ULTRASONIC_SENSOR_SUB_DEVICES::US_6: {
+            this->ultrasonic_sensor_6->read();
+            HAL_Delay(10);
+            pb->append_float(this->ultrasonic_sensor_6->get_distance());
+            break;
+          }
+        }
+
+        USB_COM_PORT::queue_payload(DATA::ULTRASONIC_SENSOR, pb);
+        delete pb;
+        break;
+      }
+
       case DATA::BRIGHTNESS: {
         PayloadBuilder *pb = new PayloadBuilder();
         pb->append_float(this->light_sensor->read_light());
@@ -334,9 +406,11 @@ void MobiController::handle_data_frame_queue() {
         delete pb;
         break;
       }
+
       case DATA::TEMPERATURE:
         USB_COM_PORT::queue_byte(DATA::TEMPERATURE, this->imu->get_temp());
         break;
+
       case DATA::BAT_VOLTAGE: {
         HAL_ADC_Start(&hadc1);  // Start ADC
         HAL_ADC_PollForConversion(&hadc1, 1);
