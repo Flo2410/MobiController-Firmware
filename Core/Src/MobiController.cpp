@@ -156,6 +156,28 @@ MobiController::MobiController() {
   this->light_sensor = new BH1750(&hi2c1, BH1750::DEFAULT_ADDRESS);
 }
 
+void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
+  // Check which sub devices
+  auto sub_device_masks = extract_subdevices_from_byte(cmd.payload[0]);
+
+  // Go through all subdevices
+  for (auto it = sub_device_masks.begin(); it < sub_device_masks.end(); ++it) {
+    SubDevice sub_device = {.min_id = data,
+                            .sub_device_mask = *it};
+
+    if (cmd.payload_length == 3) {
+      PayloadBuilder *pb = new PayloadBuilder(cmd.payload + 1, cmd.payload_length - 1);  // Payload builder without first byte
+      uint16_t freq = pb->read_uint16();
+      this->enable_periodic_update_if_disabled(sub_device, freq);
+      delete pb;
+      continue;
+    }
+
+    this->disable_periodic_update_if_enabled(sub_device);
+    this->queue_data_frame(sub_device);
+  }
+}
+
 void MobiController::handle_basic_command(QueuedCommand cmd, DATA data) {
   if (cmd.payload_length == 2) {
     PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
@@ -206,25 +228,7 @@ void MobiController::handle_command_queue() {
           break;
         }
 
-        // Check which sub devices
-        auto sub_device_masks = extract_subdevices_from_byte(cmd.payload[0]);
-
-        // Go through all subdevices
-        for (auto it = sub_device_masks.begin(); it < sub_device_masks.end(); ++it) {
-          SubDevice sub_device = {.min_id = DATA::IMU,
-                                  .sub_device_mask = *it};
-
-          if (cmd.payload_length == 3) {
-            PayloadBuilder *pb = new PayloadBuilder(cmd.payload + 1, cmd.payload_length - 1);  // Payload builder without first byte
-            uint16_t freq = pb->read_uint16();
-            this->enable_periodic_update_if_disabled(sub_device, freq);
-            continue;
-          }
-
-          this->disable_periodic_update_if_enabled(sub_device);
-          this->queue_data_frame(sub_device);
-        }
-
+        this->handle_advanced_command(cmd, DATA::IMU);
         break;
       }
 
@@ -237,10 +241,12 @@ void MobiController::handle_command_queue() {
         this->handle_basic_command(cmd, DATA::TEMPERATURE);
         break;
       }
+
       case COMMANDS::BAT_VOLTAGE: {
         this->handle_basic_command(cmd, DATA::BAT_VOLTAGE);
         break;
       }
+
       case COMMANDS::USER_BUTTON: {
         if (cmd.payload_length > 1) {
           this->send_status(STATUS::INVALID_PARAMETER);

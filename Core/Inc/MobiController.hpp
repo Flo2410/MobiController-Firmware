@@ -149,6 +149,7 @@ class MobiController {
   etl::vector<PeriodicUpdate, 20> periodic_updates;
 
   void handle_basic_command(QueuedCommand cmd, DATA data);
+  void handle_advanced_command(QueuedCommand cmd, DATA data);
   void send_status(STATUS status);
 
   void handle_periodic_update();
