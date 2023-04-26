@@ -312,6 +312,7 @@ void MobiController::handle_command_queue() {
 
       default:
         debug_print("Queued unkown command!\n");
+        this->send_status(STATUS::UNKOWN_COMMAND);
         break;
     }
   }
