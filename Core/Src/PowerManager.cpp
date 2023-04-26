@@ -44,6 +44,5 @@ void PowerManager::toggle_power_led() {
 float PowerManager::get_battery_voltage() {
   HAL_ADC_Start(&hadc1);  // Start ADC
   HAL_ADC_PollForConversion(&hadc1, 1);
-  float U = __LL_ADC_CALC_DATA_TO_VOLTAGE(3300UL, HAL_ADC_GetValue(&hadc1), LL_ADC_RESOLUTION_12B) * 0.001;
-  return U;
+  return __LL_ADC_CALC_DATA_TO_VOLTAGE(3310UL, HAL_ADC_GetValue(&hadc1), LL_ADC_RESOLUTION_12B) * (14 / 3.3) * 0.001;
 }
