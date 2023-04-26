@@ -57,15 +57,6 @@ uint16_t PayloadBuilder::read_uint16() {
   return number;
 }
 
-uint32_t PayloadBuilder::read_uint32() {
-}
-
-float PayloadBuilder::read_float() {
-}
-
-double PayloadBuilder::read_double() {
-}
-
 uint8_t* PayloadBuilder::get_payload() {
   return this->payload.begin();
 }
