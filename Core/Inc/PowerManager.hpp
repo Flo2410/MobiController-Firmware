@@ -19,7 +19,10 @@ class PowerManager {
 
   bool check_for_battery_warning(void);
 
+  bool is_battery_warning_triggered(void);
+
  private:
+  bool battery_warning_triggerd = false;
 };
 
 #endif
