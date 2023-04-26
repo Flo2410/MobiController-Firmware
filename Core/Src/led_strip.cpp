@@ -192,8 +192,8 @@ void start_animation(ANIMATION_CONFIG animation) {
 void driving_light() {
   uint8_t quater = NUM_PIXELS / 4;
 
-  fill_range_rgbw(0, quater, 0, 0, 0, 255);               // Head light
-  fill_range_rgbw(2 * quater, 3 * quater, 255, 0, 0, 0);  // Tail light
+  fill_range_rgbw(0, quater, 0, 0, 0, 255);                       // Head light
+  fill_range_rgbw(2 * quater + 1, 3 * quater + 1, 255, 0, 0, 0);  // Tail light
   update();
 }
 
