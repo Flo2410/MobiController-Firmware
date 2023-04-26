@@ -261,6 +261,12 @@ void ARGB_SetWhite(uint16_t i, uint8_t w) {
 #ifdef RGB
   return;
 #endif
+  // overflow protection
+  if (i >= NUM_PIXELS) {
+    uint16_t _i = i / NUM_PIXELS;
+    i -= _i * NUM_PIXELS;
+  }
+
   w /= 256 / ((uint16_t)ARGB_BR + 1);  // set brightness
   RGB_BUF[4 * i + 3] = w;              // set white part
 }
