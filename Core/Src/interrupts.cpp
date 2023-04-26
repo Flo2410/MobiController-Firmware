@@ -24,11 +24,3 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
   HCSR04::handle_period_elapsed_interrupts(htim);
   LED_STRIP::handle_timer_interrupt(htim);
 }
-
-// ADC
-// void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-//   // Read & Update The ADC Result
-//   uint16_t adc_res = HAL_ADC_GetValue(&hadc1);
-//   printf("%d\n", adc_res);
-//   HAL_ADC_Start_IT(&hadc1);
-// }
