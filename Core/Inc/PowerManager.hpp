@@ -12,6 +12,9 @@ class PowerManager {
   bool get_power_pozyx(void);
   bool get_power_led(void);
 
+  void toggle_power_pozyx(void);
+  void toggle_power_led(void);
+
   float get_battery_voltage(void);
 
  private:

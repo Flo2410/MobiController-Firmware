@@ -5,8 +5,8 @@
 
 PowerManager::PowerManager() {
   // Turn off the power for the led strip and pozyx
-  HAL_GPIO_WritePin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_LED_STRIP_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin, GPIO_PIN_SET);
+  this->set_power_pozyx(false);
+  this->set_power_led(false);
 
   // Calibrate ADC
   HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
@@ -16,14 +16,32 @@ PowerManager::~PowerManager() {
 }
 
 void PowerManager::set_power_pozyx(bool pwr) {
+  HAL_GPIO_WritePin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin, static_cast<GPIO_PinState>(!pwr));
 }
 
-void PowerManager::set_power_led(bool pwr) {}
+void PowerManager::set_power_led(bool pwr) {
+  HAL_GPIO_WritePin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_LED_STRIP_Pin, static_cast<GPIO_PinState>(!pwr));
+}
 
-bool PowerManager::get_power_pozyx(void) {}
-bool PowerManager::get_power_led(void) {}
+bool PowerManager::get_power_pozyx() {
+  auto pin_state = HAL_GPIO_ReadPin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin);
+  return static_cast<bool>(!pin_state);
+}
 
-float PowerManager::get_battery_voltage(void) {
+bool PowerManager::get_power_led() {
+  auto pin_state = HAL_GPIO_ReadPin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_LED_STRIP_Pin);
+  return static_cast<bool>(!pin_state);
+}
+
+void PowerManager::toggle_power_pozyx() {
+  HAL_GPIO_TogglePin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin);
+}
+
+void PowerManager::toggle_power_led() {
+  HAL_GPIO_TogglePin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_LED_STRIP_Pin);
+}
+
+float PowerManager::get_battery_voltage() {
   HAL_ADC_Start(&hadc1);  // Start ADC
   HAL_ADC_PollForConversion(&hadc1, 1);
   float U = __LL_ADC_CALC_DATA_TO_VOLTAGE(3300UL, HAL_ADC_GetValue(&hadc1), LL_ADC_RESOLUTION_12B) * 0.001;

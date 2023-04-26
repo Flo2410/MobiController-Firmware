@@ -300,9 +300,9 @@ void MobiController::handle_command_queue() {
 
         if (cmd.payload_length == 1) {
           // Set the recived mode
-          HAL_GPIO_WritePin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin, static_cast<GPIO_PinState>(!cmd.payload[0]));
+          this->pwr_manager->set_power_pozyx(cmd.payload[0]);
         } else {
-          HAL_GPIO_TogglePin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_POZYX_Pin);
+          this->pwr_manager->toggle_power_pozyx();
         }
 
         this->send_status(STATUS::OK);
