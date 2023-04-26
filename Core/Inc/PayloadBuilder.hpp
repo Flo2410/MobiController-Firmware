@@ -19,6 +19,7 @@ class PayloadBuilder {
 
   uint8_t read_uint8();
   uint16_t read_uint16();
+  int16_t read_int16();
 
   uint8_t* get_payload();
   size_t size();

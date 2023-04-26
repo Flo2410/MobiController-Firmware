@@ -57,6 +57,14 @@ uint16_t PayloadBuilder::read_uint16() {
   return number;
 }
 
+int16_t PayloadBuilder::read_int16() {
+  uint16_t number;
+  if (this->payload.size() < 2) return 0;
+  etl::mem_copy(this->payload.begin(), 2, (uint8_t*)&number);
+  this->payload.erase(this->payload.begin(), this->payload.begin() + 2);
+  return number;
+}
+
 uint8_t* PayloadBuilder::get_payload() {
   return this->payload.begin();
 }
