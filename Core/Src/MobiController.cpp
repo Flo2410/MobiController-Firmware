@@ -297,6 +297,25 @@ void MobiController::handle_command_queue() {
         this->send_status(STATUS::OK);
         break;
       }
+
+      case COMMANDS::POZYX_POWER: {
+        if (cmd.payload_length > 1 || (cmd.payload_length == 1 && cmd.payload[0] > 1)) {
+          debug_print("Got invalid parameter for pozyx power!\n");
+          this->send_status(STATUS::INVALID_PARAMETER);
+          break;
+        }
+
+        if (cmd.payload_length == 1) {
+          // Set the recived mode
+          HAL_GPIO_WritePin(ONOFF_POZYX_GPIO_Port, ONOFF_POZYX_Pin, static_cast<GPIO_PinState>(!cmd.payload[0]));
+        } else {
+          HAL_GPIO_TogglePin(ONOFF_LED_STRIP_GPIO_Port, ONOFF_POZYX_Pin);
+        }
+
+        this->send_status(STATUS::OK);
+        break;
+      }
+
         // TODO: Handle all other commands
 
       default:
