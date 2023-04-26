@@ -5,6 +5,7 @@
 #include "PowerManager.hpp"
 #include "UserButtton.hpp"
 #include "bh1750.hpp"
+#include "can_lib.hpp"
 #include "encoder.hpp"
 #include "etl/queue.h"
 #include "etl/vector.h"
@@ -120,6 +121,7 @@ class MobiController {
   Encoder *encoder_2;
   Encoder *encoder_3;
   Encoder *encoder_4;
+  CAN_LIB *can_lib;
 
   void loop();
 

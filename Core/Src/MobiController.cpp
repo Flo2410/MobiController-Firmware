@@ -4,6 +4,8 @@
 #include "PowerManager.hpp"
 #include "UserButtton.hpp"
 #include "bh1750.hpp"
+#include "can.h"
+#include "can_lib.hpp"
 #include "cpp_main.hpp"
 #include "encoder.hpp"
 #include "etl/vector.h"
@@ -167,6 +169,8 @@ MobiController::MobiController() {
   this->encoder_2 = new Encoder(ENCODER_2_A_GPIO_Port, ENCODER_2_A_Pin, ENCODER_2_B_GPIO_Port, ENCODER_2_B_Pin);
   this->encoder_3 = new Encoder(ENCODER_3_A_GPIO_Port, ENCODER_3_A_Pin, ENCODER_3_B_GPIO_Port, ENCODER_3_B_Pin);
   this->encoder_4 = new Encoder(ENCODER_4_A_GPIO_Port, ENCODER_4_A_Pin, ENCODER_4_B_GPIO_Port, ENCODER_4_B_Pin);
+  this->can_lib = new CAN_LIB(&hcan1);
+  this->can_lib->send_stop();
 }
 
 void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
@@ -303,6 +307,34 @@ void MobiController::handle_command_queue() {
         }
 
         this->send_status(STATUS::OK);
+        break;
+      }
+
+      case COMMANDS::MOTOR_CONTROL: {
+        if (cmd.payload_length > 6 || cmd.payload_length % 2 != 0) {
+          debug_print("Got invalid parameter for motor control!\n");
+          this->send_status(STATUS::INVALID_PARAMETER);
+          break;
+        }
+
+        int16_t v[3] = {};
+
+        if (cmd.payload_length != 0) {
+          PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
+
+          for (size_t i = 0; i < 3; ++i) {
+            if (pb->size() == 0) break;
+            v[i] = pb->read_int16();
+          }
+          delete pb;
+        }
+
+        auto status = this->can_lib->drive(v[0], v[1], v[2]);
+        if (status == HAL_OK)
+          this->send_status(STATUS::OK);
+        else
+          this->send_status(STATUS::ERROR);
+
         break;
       }
 
