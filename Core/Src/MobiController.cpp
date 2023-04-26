@@ -11,6 +11,7 @@
 #include "etl/vector.h"
 #include "hcsr04.hpp"
 #include "i2c.h"
+#include "led_strip.hpp"
 #include "min.h"
 #include "stdarg.h"
 #include "stdio.h"
@@ -171,6 +172,10 @@ MobiController::MobiController() {
   this->encoder_4 = new Encoder(ENCODER_4_A_GPIO_Port, ENCODER_4_A_Pin, ENCODER_4_B_GPIO_Port, ENCODER_4_B_Pin);
   this->can_lib = new CAN_LIB(&hcan1);
   this->can_lib->send_stop();
+
+  LED_STRIP::init();
+  LED_STRIP::clear_and_update();
+  LED_STRIP::set_brightness(50);
 }
 
 void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
@@ -304,6 +309,83 @@ void MobiController::handle_command_queue() {
             this->user_btn->set_mode(UserButtton::MODE::INTERNAL);
           else if (current_mode == UserButtton::MODE::INTERNAL)
             this->user_btn->set_mode(UserButtton::MODE::EXTERNAL);
+        }
+
+        this->send_status(STATUS::OK);
+        break;
+      }
+
+      case COMMANDS::LED_STRIP: {
+        if (cmd.payload_length == 0) {  // turn off the leds
+          LED_STRIP::stop_animation();
+          LED_STRIP::clear_and_update();
+          this->pwr_manager->set_power_led(false);
+
+        } else if (cmd.payload_length == 1 || (cmd.payload_length >= 5 && cmd.payload_length <= 10)) {  // Select preset
+          PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
+          uint8_t preset = pb->read_uint8();
+
+          LED_STRIP::COLOR_RGBW color = {255, 255, 0, 0};
+
+          if (cmd.payload_length >= 5) {
+            color.r = pb->read_uint8();
+            color.g = pb->read_uint8();
+            color.b = pb->read_uint8();
+            color.w = pb->read_uint8();
+          }
+
+          this->pwr_manager->set_power_led(true);
+          LED_STRIP::stop_animation();
+          LED_STRIP::clear_and_update();
+
+          switch (preset) {
+            // Driving lights
+            case 0: {
+              LED_STRIP::driving_light();
+              break;
+            }
+
+            // Beacon
+            case 1: {
+              uint8_t update_rate = cmd.payload_length >= 6 ? pb->read_uint8() : 5;
+              uint8_t line_length = cmd.payload_length >= 7 ? pb->read_uint8() : 4;
+              uint8_t line_count = cmd.payload_length >= 8 ? pb->read_uint8() : 4;
+              uint8_t rotate_left = cmd.payload_length >= 9 ? static_cast<bool>(pb->read_uint8()) : false;
+              uint8_t frame_count = cmd.payload_length == 10 ? pb->read_uint8() : NUM_PIXELS;
+
+              LED_STRIP::beacon_rgbw(color, update_rate, frame_count, line_length, line_count, rotate_left);
+              break;
+            }
+
+            // Blink
+            case 2: {
+              uint8_t update_rate = cmd.payload_length >= 6 ? pb->read_uint8() : 50;
+              uint8_t line_length = cmd.payload_length >= 7 ? pb->read_uint8() : NUM_PIXELS;
+              uint8_t line_count = cmd.payload_length == 8 ? pb->read_uint8() : 1;
+
+              LED_STRIP::blink(color, update_rate, line_length, line_count);
+              break;
+            }
+
+            // On
+            case 3: {
+              LED_STRIP::fill_rgbw(color);
+              break;
+            }
+
+            // Default: invalid preset id
+            default: {
+              this->send_status(STATUS::INVALID_PARAMETER);
+              break;
+            }
+          }
+
+          delete pb;
+
+        } else {  // Error
+          debug_print("Got invalid parameter for led strip!\n");
+          this->send_status(STATUS::INVALID_PARAMETER);
+          break;
         }
 
         this->send_status(STATUS::OK);
