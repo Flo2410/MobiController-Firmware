@@ -3,7 +3,6 @@
 #include "Bno055.hpp"
 #include "PowerManager.hpp"
 #include "UserButtton.hpp"
-#include "adc.h"
 #include "bh1750.hpp"
 #include "cpp_main.hpp"
 #include "etl/vector.h"
@@ -434,9 +433,8 @@ void MobiController::handle_data_frame_queue() {
         break;
 
       case DATA::BAT_VOLTAGE: {
-        float U = this->pwr_manager->get_battery_voltage();
         PayloadBuilder *pb = new PayloadBuilder();
-        pb->append_float(U);
+        pb->append_float(this->pwr_manager->get_battery_voltage());
         USB_COM_PORT::queue_payload(DATA::BAT_VOLTAGE, pb);
         delete pb;
         break;
