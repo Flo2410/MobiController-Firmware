@@ -82,14 +82,6 @@ class MobiController {
     ENCODER_4 = 0x8,
   };
 
-  enum class USER_BUTTON_SUB_DEVICES {
-    USE_USER_BUTTON = 0x1,
-  };
-
-  enum class POZYX_POWER_SUB_DEVICES {
-    POWER = 0x1,
-  };
-
   enum class POZYX_SUB_DEVICES {
     POSITION = 0x1,
     ORIENTATION = 0x2,
