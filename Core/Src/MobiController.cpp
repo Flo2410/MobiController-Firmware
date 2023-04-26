@@ -5,6 +5,7 @@
 #include "UserButtton.hpp"
 #include "bh1750.hpp"
 #include "cpp_main.hpp"
+#include "encoder.hpp"
 #include "etl/vector.h"
 #include "hcsr04.hpp"
 #include "i2c.h"
@@ -162,6 +163,10 @@ MobiController::MobiController() {
   this->ultrasonic_sensor_4 = new HCSR04(&htim2, TIM_Channel_1, TRIG_4_GPIO_Port, TRIG_4_Pin);
   this->ultrasonic_sensor_5 = new HCSR04(&htim2, TIM_Channel_4, TRIG_5_GPIO_Port, TRIG_5_Pin);
   this->ultrasonic_sensor_6 = new HCSR04(&htim2, TIM_Channel_2, TRIG_6_GPIO_Port, TRIG_6_Pin);
+  this->encoder_1 = new Encoder(ENCODER_1_A_GPIO_Port, ENCODER_1_A_Pin, ENCODER_1_B_GPIO_Port, ENCODER_1_B_Pin);
+  this->encoder_2 = new Encoder(ENCODER_2_A_GPIO_Port, ENCODER_2_A_Pin, ENCODER_2_B_GPIO_Port, ENCODER_2_B_Pin);
+  this->encoder_3 = new Encoder(ENCODER_3_A_GPIO_Port, ENCODER_3_A_Pin, ENCODER_3_B_GPIO_Port, ENCODER_3_B_Pin);
+  this->encoder_4 = new Encoder(ENCODER_4_A_GPIO_Port, ENCODER_4_A_Pin, ENCODER_4_B_GPIO_Port, ENCODER_4_B_Pin);
 }
 
 void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
@@ -248,6 +253,17 @@ void MobiController::handle_command_queue() {
         }
 
         this->handle_advanced_command(cmd, DATA::ULTRASONIC_SENSOR);
+        break;
+      }
+
+      case COMMANDS::ENCODER: {
+        if (cmd.payload_length == 0 || cmd.payload[0] == 0 || cmd.payload[0] > 0xF) {
+          debug_print("Got invalid encoder subdevice!\n");
+          this->send_status(STATUS::INVALID_PARAMETER);
+          break;
+        }
+
+        this->handle_advanced_command(cmd, DATA::ENCODER);
         break;
       }
 
@@ -417,6 +433,37 @@ void MobiController::handle_data_frame_queue() {
         }
 
         USB_COM_PORT::queue_payload(DATA::ULTRASONIC_SENSOR, pb);
+        delete pb;
+        break;
+      }
+
+      case DATA::ENCODER: {
+        PayloadBuilder *pb = new PayloadBuilder();
+        pb->append_uint8(sub_device.sub_device_mask);
+
+        switch (static_cast<ENCODER_SUB_DEVICES>(sub_device.sub_device_mask)) {
+          case ENCODER_SUB_DEVICES::ENCODER_1: {
+            pb->append_uint16(this->encoder_1->get_counter());
+            break;
+          }
+
+          case ENCODER_SUB_DEVICES::ENCODER_2: {
+            pb->append_uint16(this->encoder_2->get_counter());
+            break;
+          }
+
+          case ENCODER_SUB_DEVICES::ENCODER_3: {
+            pb->append_uint16(this->encoder_3->get_counter());
+            break;
+          }
+
+          case ENCODER_SUB_DEVICES::ENCODER_4: {
+            pb->append_uint16(this->encoder_4->get_counter());
+            break;
+          }
+        }
+
+        USB_COM_PORT::queue_payload(DATA::ENCODER, pb);
         delete pb;
         break;
       }

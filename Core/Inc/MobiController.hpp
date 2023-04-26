@@ -5,6 +5,7 @@
 #include "PowerManager.hpp"
 #include "UserButtton.hpp"
 #include "bh1750.hpp"
+#include "encoder.hpp"
 #include "etl/queue.h"
 #include "etl/vector.h"
 #include "hcsr04.hpp"
@@ -115,6 +116,10 @@ class MobiController {
   HCSR04 *ultrasonic_sensor_4;
   HCSR04 *ultrasonic_sensor_5;
   HCSR04 *ultrasonic_sensor_6;
+  Encoder *encoder_1;
+  Encoder *encoder_2;
+  Encoder *encoder_3;
+  Encoder *encoder_4;
 
   void loop();
 
