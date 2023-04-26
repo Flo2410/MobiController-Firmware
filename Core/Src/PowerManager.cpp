@@ -46,3 +46,8 @@ float PowerManager::get_battery_voltage() {
   HAL_ADC_PollForConversion(&hadc1, 1);
   return __LL_ADC_CALC_DATA_TO_VOLTAGE(3310UL, HAL_ADC_GetValue(&hadc1), LL_ADC_RESOLUTION_12B) * (14 / 3.3) * 0.001;
 }
+
+bool PowerManager::check_for_battery_warning() {
+  float U = this->get_battery_voltage();
+  return U <= 11;  // Check if the battery voltage is bellow 11 V
+}

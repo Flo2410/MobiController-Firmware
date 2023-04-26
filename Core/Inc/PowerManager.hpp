@@ -17,6 +17,8 @@ class PowerManager {
 
   float get_battery_voltage(void);
 
+  bool check_for_battery_warning(void);
+
  private:
 };
 
