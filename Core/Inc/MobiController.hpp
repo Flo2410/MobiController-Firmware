@@ -2,6 +2,7 @@
 #define MOBI_CONTROLLER_H_
 
 #include "Bno055.hpp"
+#include "PowerManager.hpp"
 #include "UserButtton.hpp"
 #include "bh1750.hpp"
 #include "etl/queue.h"
@@ -112,6 +113,7 @@ class MobiController {
   };
 
   // Devices
+  PowerManager *pwr_manager;
   Bno055 *imu;
   UserButtton *user_btn;
   BH1750 *light_sensor;

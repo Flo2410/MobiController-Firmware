@@ -89,6 +89,7 @@ CPP_SOURCES = \
 Core/Src/Bno055.cpp \
 Core/Src/MobiController.cpp \
 Core/Src/PayloadBuilder.cpp \
+Core/Src/PowerManager.cpp \
 Core/Src/UserButton.cpp \
 Core/Src/bh1750.cpp \
 Core/Src/c_bridge.cpp \

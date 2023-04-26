@@ -1,6 +1,7 @@
 #include "MobiController.hpp"
 
 #include "Bno055.hpp"
+#include "PowerManager.hpp"
 #include "UserButtton.hpp"
 #include "adc.h"
 #include "bh1750.hpp"
@@ -152,6 +153,7 @@ MobiController::MobiController() {
   min_init_context(&min_ctx, 0);  // Init min proto
 
   // Init all devices
+  this->pwr_manager = new PowerManager();
   this->imu = new Bno055(&hi2c1);
   this->user_btn = new UserButtton(USER_BTN_GPIO_Port, USER_BTN_Pin);
   this->light_sensor = new BH1750(&hi2c1, BH1750::DEFAULT_ADDRESS);
@@ -432,9 +434,7 @@ void MobiController::handle_data_frame_queue() {
         break;
 
       case DATA::BAT_VOLTAGE: {
-        HAL_ADC_Start(&hadc1);  // Start ADC
-        HAL_ADC_PollForConversion(&hadc1, 1);
-        float U = __LL_ADC_CALC_DATA_TO_VOLTAGE(3300UL, HAL_ADC_GetValue(&hadc1), LL_ADC_RESOLUTION_12B) * 0.001;
+        float U = this->pwr_manager->get_battery_voltage();
         PayloadBuilder *pb = new PayloadBuilder();
         pb->append_float(U);
         USB_COM_PORT::queue_payload(DATA::BAT_VOLTAGE, pb);
