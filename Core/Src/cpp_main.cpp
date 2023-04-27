@@ -15,6 +15,7 @@ int cpp_main() {
   printf("MobiController Firmware\n");
   printf("version 0.1\n");
   printf("Time of compilation: %s %s\n", __DATE__, __TIME__);
+  printf("Compiler version: %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
   printf("Copyright FHWN Florian Hye\n");
   printf("---------------------------------------------\n\n");
 
