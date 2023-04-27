@@ -370,6 +370,7 @@ void MobiController::handle_command_queue() {
             // On
             case 3: {
               LED_STRIP::fill_rgbw(color);
+              LED_STRIP::update();
               break;
             }
 
