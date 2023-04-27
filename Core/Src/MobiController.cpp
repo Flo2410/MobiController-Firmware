@@ -644,9 +644,10 @@ void MobiController::handle_data_frame_queue() {
         break;
       }
 
-      case DATA::TEMPERATURE:
+      case DATA::TEMPERATURE: {
         USB_COM_PORT::queue_byte(DATA::TEMPERATURE, this->imu->get_temp());
         break;
+      }
 
       case DATA::BAT_VOLTAGE: {
         PayloadBuilder *pb = new PayloadBuilder();
