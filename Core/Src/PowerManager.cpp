@@ -48,7 +48,7 @@ float PowerManager::get_battery_voltage() {
 }
 
 bool PowerManager::check_for_battery_warning() {
-    float U = this->get_battery_voltage();
+  float U = this->get_battery_voltage();
   // Check if the battery voltage is bellow 11 V
   if (U <= 11) {
     this->battery_warning_triggerd = true;
