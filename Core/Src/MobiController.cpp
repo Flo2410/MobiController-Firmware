@@ -38,19 +38,6 @@ void MobiController::loop() {
   this->handle_count_to_1_min();
 }
 
-void MobiController::handle_count_to_1_min() {
-  uint32_t current_ms = HAL_GetTick();
-
-  // check if current ms is less then last ms plus 1 min
-  if (current_ms < this->last_tick_ms + 30000) return;
-  this->last_tick_ms = current_ms;
-
-  // Code below is run every 60 sec
-
-  // Check battery warning
-  this->handle_battery_check();
-}
-
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
   // Check that the recived id is a valid command.
   if ((min_id >= 0x20 && min_id <= 0x2B) || min_id == 0x3e) {
@@ -194,6 +181,19 @@ MobiController::MobiController() {
   LED_STRIP::set_brightness(50);
 
   // Check the battery on startup
+  this->handle_battery_check();
+}
+
+void MobiController::handle_count_to_1_min() {
+  uint32_t current_ms = HAL_GetTick();
+
+  // check if current ms is less then last ms plus 1 min
+  if (current_ms < this->last_tick_ms + 30000) return;
+  this->last_tick_ms = current_ms;
+
+  // Code below is run every 60 sec
+
+  // Check battery warning
   this->handle_battery_check();
 }
 

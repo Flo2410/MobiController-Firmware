@@ -21,6 +21,10 @@ class MobiController {
 
   static void debug_print(const char *msg, ...);
 
+  // --------------------------------------------------
+  // Begin generated code from protocol.json
+  // --------------------------------------------------
+
   // commands
   enum class COMMANDS {
     IMU = 0x20,
@@ -99,6 +103,10 @@ class MobiController {
     BATTERY_WARNING = 0x4,
   };
 
+  // --------------------------------------------------
+  // END generated code
+  // --------------------------------------------------
+
   struct QueuedCommand {
     COMMANDS min_id;
     uint8_t const *payload;
@@ -134,7 +142,6 @@ class MobiController {
   CAN_LIB *can_lib;
 
   void loop();
-  void handle_count_to_1_min();
 
   void queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload);
 
@@ -168,6 +175,8 @@ class MobiController {
   etl::vector<PeriodicUpdate, 20> periodic_updates;
 
   uint32_t last_tick_ms = 0;
+
+  void handle_count_to_1_min();
 
   void handle_basic_command(QueuedCommand cmd, DATA data);
   void handle_advanced_command(QueuedCommand cmd, DATA data);
