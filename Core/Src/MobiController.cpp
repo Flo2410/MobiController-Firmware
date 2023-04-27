@@ -247,6 +247,9 @@ void MobiController::handle_battery_check() {
 
     // Stop driving
     this->can_lib->send_stop();
+
+    // Power of pozyx
+    this->pwr_manager->set_power_pozyx(false);
   }
 }
 
