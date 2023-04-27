@@ -26,6 +26,7 @@ class MobiController {
     ERROR,
     INVALID_PARAMETER,
     UNKOWN_COMMAND,
+    BATTERY_WARNING
   };
 
   // commands
