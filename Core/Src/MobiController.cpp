@@ -8,6 +8,7 @@
 #include "can_lib.hpp"
 #include "cpp_main.hpp"
 #include "encoder.hpp"
+#include "etl/to_string.h"
 #include "etl/vector.h"
 #include "hcsr04.hpp"
 #include "i2c.h"
@@ -487,6 +488,10 @@ void MobiController::handle_command_queue() {
         break;
       }
 
+      case COMMANDS::FIRMWARE_INFO: {
+        this->handle_basic_command(cmd, DATA::FIRMWARE_INFO);
+        break;
+      }
         // TODO: Handle all other commands
 
       default:
@@ -647,6 +652,26 @@ void MobiController::handle_data_frame_queue() {
         PayloadBuilder *pb = new PayloadBuilder();
         pb->append_float(this->pwr_manager->get_battery_voltage());
         USB_COM_PORT::queue_payload(DATA::BAT_VOLTAGE, pb);
+        delete pb;
+        break;
+      }
+
+      case DATA::FIRMWARE_INFO: {
+        etl::string<255> str = "MobiController Firmware\n";
+        str.append("Firmware Version: ").append("0.1\n");
+        str.append("Compiled on: ").append(__DATE__).append(" ").append(__TIME__).append("\n");
+        str.append("Compiler version (GNUC): ");
+        etl::to_string(__GNUC__, str, true);
+        str.append(".");
+        etl::to_string(__GNUC_MINOR__, str, true);
+        str.append(".");
+        etl::to_string(__GNUC_PATCHLEVEL__, str, true);
+        str.append("\n");
+        str.append("Copyright Florian Hye - FHWN BRO20");
+
+        PayloadBuilder *pb = new PayloadBuilder();
+        pb->append_string(str);
+        USB_COM_PORT::queue_payload(DATA::FIRMWARE_INFO, pb);
         delete pb;
         break;
       }
