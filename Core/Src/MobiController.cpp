@@ -33,6 +33,31 @@ void MobiController::loop() {
   this->handle_periodic_update();
   this->handle_command_queue();
   this->handle_data_frame_queue();
+
+  this->handle_count_to_1_min();
+}
+
+void MobiController::handle_count_to_1_min() {
+  uint32_t current_ms = HAL_GetTick();
+
+  // check if current ms is less then last ms plus 1 min
+  if (current_ms < this->last_tick_ms + 60000) return;
+  this->last_tick_ms = current_ms;
+
+  // Code below is run every 60 sec
+
+  // Check battery warning
+  debug_print("Checking for battery warning\n");
+  if (this->pwr_manager->check_for_battery_warning()) {
+    debug_print("Battery LOW!\n");
+    this->send_status(STATUS::BATTERY_WARNING);
+    // LED
+    this->pwr_manager->set_power_led(true);
+    LED_STRIP::battery_warning_light();
+
+    // Stop driving
+    this->can_lib->send_stop();
+  }
 }
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {

@@ -125,6 +125,7 @@ class MobiController {
   CAN_LIB *can_lib;
 
   void loop();
+  void handle_count_to_1_min();
 
   void queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload);
 
@@ -156,6 +157,8 @@ class MobiController {
   etl::queue<SubDevice, 100> data_frame_queue;
   etl::queue<QueuedCommand, 100> command_queue;
   etl::vector<PeriodicUpdate, 20> periodic_updates;
+
+  uint32_t last_tick_ms = 0;
 
   void handle_basic_command(QueuedCommand cmd, DATA data);
   void handle_advanced_command(QueuedCommand cmd, DATA data);
