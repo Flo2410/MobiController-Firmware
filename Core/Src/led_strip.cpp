@@ -197,6 +197,10 @@ void driving_light() {
   update();
 }
 
+void battery_warning_light() {
+  blink({255, 0, 0, 0}, 10, NUM_PIXELS, 1);
+}
+
 void beacon_rgbw(COLOR_RGBW color, uint8_t update_rate, uint8_t frame_count, uint8_t line_length, uint8_t line_count, bool rotate_left) {
   ANIMATION_CONFIG animation;
   animation.type = rotate_left ? ANIMATION_TYPE::ROTATE_LEFT : ANIMATION_TYPE::ROTATE_RIGHT;
