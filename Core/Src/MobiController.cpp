@@ -2,6 +2,7 @@
 
 #include "Bno055.hpp"
 #include "PowerManager.hpp"
+#include "Pozyx.hpp"
 #include "UserButtton.hpp"
 #include "bh1750.hpp"
 #include "can.h"
@@ -175,6 +176,7 @@ MobiController::MobiController() {
   this->encoder_4 = new Encoder(ENCODER_4_A_GPIO_Port, ENCODER_4_A_Pin, ENCODER_4_B_GPIO_Port, ENCODER_4_B_Pin);
   this->can_lib = new CAN_LIB(&hcan1);
   this->can_lib->send_stop();
+  this->pozyx = new Pozyx(&hi2c1);
 
   LED_STRIP::init();
   LED_STRIP::clear_and_update();
@@ -488,6 +490,11 @@ void MobiController::handle_command_queue() {
         break;
       }
 
+      case COMMANDS::POZYX_CONFIG: {
+        this->handle_basic_command(cmd, DATA::POZYX_CONFIG);
+        break;
+      }
+
       case COMMANDS::FIRMWARE_INFO: {
         this->handle_basic_command(cmd, DATA::FIRMWARE_INFO);
         break;
@@ -653,6 +660,25 @@ void MobiController::handle_data_frame_queue() {
         PayloadBuilder *pb = new PayloadBuilder();
         pb->append_float(this->pwr_manager->get_battery_voltage());
         USB_COM_PORT::queue_payload(DATA::BAT_VOLTAGE, pb);
+        delete pb;
+        break;
+      }
+
+      case DATA::POZYX_CONFIG: {
+        uint8_t fw_version;
+        auto status = this->pozyx->get_firmware_version(&fw_version);
+
+        if (status != 1) {
+          debug_print("Error getting pozyx firmware version\n");
+          this->send_status(STATUS_CODE::ERROR);
+          break;
+        }
+
+        PayloadBuilder *pb = new PayloadBuilder();
+        pb->append_uint8(123);  // FIXME: Dummy tag id
+        pb->append_uint8(fw_version);
+
+        USB_COM_PORT::queue_payload(DATA::POZYX_CONFIG, pb);
         delete pb;
         break;
       }

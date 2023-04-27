@@ -5,6 +5,7 @@
 
 #include "Bno055.hpp"
 #include "PowerManager.hpp"
+#include "Pozyx.hpp"
 #include "UserButtton.hpp"
 #include "bh1750.hpp"
 #include "can_lib.hpp"
@@ -142,6 +143,7 @@ class MobiController {
   Encoder *encoder_3;
   Encoder *encoder_4;
   CAN_LIB *can_lib;
+  Pozyx *pozyx;
 
   void loop();
 
