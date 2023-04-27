@@ -1,6 +1,7 @@
 #include "PayloadBuilder.hpp"
 
 #include "etl/memory.h"
+#include "etl/string.h"
 
 PayloadBuilder::PayloadBuilder() {
 }
@@ -42,6 +43,10 @@ void PayloadBuilder::append_vector(Bno055::vector_t vec) {
   this->append_double(vec.x);
   this->append_double(vec.y);
   this->append_double(vec.z);
+}
+
+void PayloadBuilder::append_string(etl::string<255> str) {
+  this->payload.insert(this->payload.end(), str.c_str(), str.c_str() + str.length());
 }
 
 uint8_t PayloadBuilder::read_uint8() {
