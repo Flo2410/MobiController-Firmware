@@ -52,17 +52,17 @@ void MobiController::handle_count_to_1_min() {
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
   // Check that the recived id is a valid command.
-  if (min_id < 0x20 || min_id > 0x2B) {
-    debug_print("Recieved unkown command with ID: %#.2x!\n", min_id);
-    this->send_status(STATUS_CODE::UNKOWN_COMMAND);
+  if ((min_id >= 0x20 && min_id <= 0x2B) || min_id == 0x3e) {
+    QueuedCommand cmd = {
+        .min_id = static_cast<COMMANDS>(min_id),
+        .payload = min_payload,
+        .payload_length = len_payload};
+    this->command_queue.push(cmd);
     return;
   }
 
-  QueuedCommand cmd = {
-      .min_id = static_cast<COMMANDS>(min_id),
-      .payload = min_payload,
-      .payload_length = len_payload};
-  this->command_queue.push(cmd);
+  debug_print("Recieved unkown command with ID: %#.2x!\n", min_id);
+  this->send_status(STATUS_CODE::UNKOWN_COMMAND);
 }
 
 void MobiController::queue_data_frame(SubDevice sub_device) {

@@ -35,6 +35,7 @@ class MobiController {
     POZYX_POWER = 0x29,
     POZYX = 0x2a,
     POZYX_CONFIG = 0x2b,
+    FIRMWARE_INFO = 0x3e,
   };
 
   // data
@@ -49,6 +50,7 @@ class MobiController {
     USER_BUTTON = 0x7,
     POZYX = 0x8,
     POZYX_CONFIG = 0x9,
+    FIRMWARE_INFO = 0x3f,
   };
 
   enum class IMU_SUB_DEVICES {
