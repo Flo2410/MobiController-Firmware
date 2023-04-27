@@ -355,7 +355,7 @@ void MobiController::handle_command_queue() {
 
         } else if (cmd.payload_length == 1 || (cmd.payload_length >= 5 && cmd.payload_length <= 10)) {  // Select preset
           PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
-          uint8_t preset = pb->read_uint8();
+          ANIMATION_PRESET preset = static_cast<ANIMATION_PRESET>(pb->read_uint8());
 
           LED_STRIP::COLOR_RGBW color = {255, 255, 0, 0};
 
@@ -372,13 +372,13 @@ void MobiController::handle_command_queue() {
 
           switch (preset) {
             // Driving lights
-            case 0: {
+            case ANIMATION_PRESET::DRIVING_LIGHTS: {
               LED_STRIP::driving_light();
               break;
             }
 
             // Beacon
-            case 1: {
+            case ANIMATION_PRESET::BEACON: {
               uint8_t update_rate = cmd.payload_length >= 6 ? pb->read_uint8() : 5;
               uint8_t line_length = cmd.payload_length >= 7 ? pb->read_uint8() : 4;
               uint8_t line_count = cmd.payload_length >= 8 ? pb->read_uint8() : 4;
@@ -390,7 +390,7 @@ void MobiController::handle_command_queue() {
             }
 
             // Blink
-            case 2: {
+            case ANIMATION_PRESET::BLINK: {
               uint8_t update_rate = cmd.payload_length >= 6 ? pb->read_uint8() : 50;
               uint8_t line_length = cmd.payload_length >= 7 ? pb->read_uint8() : NUM_PIXELS;
               uint8_t line_count = cmd.payload_length == 8 ? pb->read_uint8() : 1;
@@ -400,7 +400,7 @@ void MobiController::handle_command_queue() {
             }
 
             // On
-            case 3: {
+            case ANIMATION_PRESET::ON: {
               LED_STRIP::fill_rgbw(color);
               LED_STRIP::update();
               break;

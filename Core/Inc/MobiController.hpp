@@ -77,6 +77,13 @@ class MobiController {
     ENCODER_4 = 0x8,
   };
 
+  enum class ANIMATION_PRESET {
+    DRIVING_LIGHTS = 0x0,
+    BEACON = 0x1,
+    BLINK = 0x2,
+    ON = 0x3,
+  };
+
   enum class POZYX_SUB_DEVICES {
     POSITION = 0x1,
     ORIENTATION = 0x2,
