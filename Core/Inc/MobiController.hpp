@@ -1,6 +1,8 @@
 #ifndef MOBI_CONTROLLER_H_
 #define MOBI_CONTROLLER_H_
 
+#define FIRMWARE_VERSION "v0.2"
+
 #include "Bno055.hpp"
 #include "PowerManager.hpp"
 #include "UserButtton.hpp"

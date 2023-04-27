@@ -658,7 +658,7 @@ void MobiController::handle_data_frame_queue() {
 
       case DATA::FIRMWARE_INFO: {
         etl::string<255> str = "MobiController Firmware\n";
-        str.append("Firmware Version: ").append("0.1\n");
+        str.append("Firmware Version: ").append(FIRMWARE_VERSION).append("\n");
         str.append("Compiled on: ").append(__DATE__).append(" ").append(__TIME__).append("\n");
         str.append("Compiler version (GNUC): ");
         etl::to_string(__GNUC__, str, true);
