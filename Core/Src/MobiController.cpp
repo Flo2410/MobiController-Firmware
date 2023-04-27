@@ -341,6 +341,13 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::LED_STRIP: {
+        // Disable LED_STRIP command if the battery is low.
+        // This is done so the user can not overwrite the warning lights.
+        if (this->pwr_manager->is_battery_warning_triggered()) {
+          this->send_status(STATUS::BATTERY_WARNING);
+          break;
+        }
+
         if (cmd.payload_length == 0) {  // turn off the leds
           LED_STRIP::stop_animation();
           LED_STRIP::clear_and_update();
@@ -422,6 +429,12 @@ void MobiController::handle_command_queue() {
         if (cmd.payload_length > 6 || cmd.payload_length % 2 != 0) {
           debug_print("Got invalid parameter for motor control!\n");
           this->send_status(STATUS::INVALID_PARAMETER);
+          break;
+        }
+
+        // Disable the MOTOR_CONTROL command if the battery is low.
+        if (this->pwr_manager->is_battery_warning_triggered()) {
+          this->send_status(STATUS::BATTERY_WARNING);
           break;
         }
 
