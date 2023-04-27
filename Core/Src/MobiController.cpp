@@ -41,7 +41,7 @@ void MobiController::handle_count_to_1_min() {
   uint32_t current_ms = HAL_GetTick();
 
   // check if current ms is less then last ms plus 1 min
-  if (current_ms < this->last_tick_ms + 60000) return;
+  if (current_ms < this->last_tick_ms + 30000) return;
   this->last_tick_ms = current_ms;
 
   // Code below is run every 60 sec
