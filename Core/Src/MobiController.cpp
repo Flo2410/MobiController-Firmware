@@ -47,17 +47,7 @@ void MobiController::handle_count_to_1_min() {
   // Code below is run every 60 sec
 
   // Check battery warning
-  debug_print("Checking for battery warning\n");
-  if (this->pwr_manager->check_for_battery_warning()) {
-    debug_print("Battery LOW!\n");
-    this->send_status(STATUS_CODE::BATTERY_WARNING);
-    // LED
-    this->pwr_manager->set_power_led(true);
-    LED_STRIP::battery_warning_light();
-
-    // Stop driving
-    this->can_lib->send_stop();
-  }
+  this->handle_battery_check();
 }
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
@@ -201,6 +191,9 @@ MobiController::MobiController() {
   LED_STRIP::init();
   LED_STRIP::clear_and_update();
   LED_STRIP::set_brightness(50);
+
+  // Check the battery on startup
+  this->handle_battery_check();
 }
 
 void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
@@ -241,6 +234,20 @@ void MobiController::handle_basic_command(QueuedCommand cmd, DATA data) {
 
 void MobiController::send_status(STATUS_CODE status) {
   USB_COM_PORT::queue_byte(0, static_cast<uint8_t>(status));
+}
+
+void MobiController::handle_battery_check() {
+  debug_print("Checking for battery warning\n");
+  if (this->pwr_manager->check_for_battery_warning()) {
+    debug_print("Battery LOW!\n");
+    this->send_status(STATUS_CODE::BATTERY_WARNING);
+    // LED
+    this->pwr_manager->set_power_led(true);
+    LED_STRIP::battery_warning_light();
+
+    // Stop driving
+    this->can_lib->send_stop();
+  }
 }
 
 void MobiController::handle_periodic_update() {

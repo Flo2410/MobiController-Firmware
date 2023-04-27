@@ -171,6 +171,8 @@ class MobiController {
   void handle_advanced_command(QueuedCommand cmd, DATA data);
   void send_status(STATUS_CODE status);
 
+  void handle_battery_check();
+
   void handle_periodic_update();
   void handle_command_queue();
   void handle_data_frame_queue();
