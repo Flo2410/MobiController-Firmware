@@ -50,7 +50,7 @@ void MobiController::handle_count_to_1_min() {
   debug_print("Checking for battery warning\n");
   if (this->pwr_manager->check_for_battery_warning()) {
     debug_print("Battery LOW!\n");
-    this->send_status(STATUS::BATTERY_WARNING);
+    this->send_status(STATUS_CODE::BATTERY_WARNING);
     // LED
     this->pwr_manager->set_power_led(true);
     LED_STRIP::battery_warning_light();
@@ -64,7 +64,7 @@ void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, u
   // Check that the recived id is a valid command.
   if (min_id < 0x20 || min_id > 0x2B) {
     debug_print("Recieved unkown command with ID: %#.2x!\n", min_id);
-    this->send_status(STATUS::UNKOWN_COMMAND);
+    this->send_status(STATUS_CODE::UNKOWN_COMMAND);
     return;
   }
 
@@ -239,7 +239,7 @@ void MobiController::handle_basic_command(QueuedCommand cmd, DATA data) {
   this->queue_data_frame(data);
 }
 
-void MobiController::send_status(STATUS status) {
+void MobiController::send_status(STATUS_CODE status) {
   USB_COM_PORT::queue_byte(0, static_cast<uint8_t>(status));
 }
 
@@ -271,7 +271,7 @@ void MobiController::handle_command_queue() {
       case COMMANDS::IMU: {
         if (cmd.payload_length == 0 || cmd.payload[0] == 0 || (cmd.payload[0] | 0b01111111) == 0xff) {
           debug_print("Got invalid IMU subdevice!\n");
-          this->send_status(STATUS::INVALID_PARAMETER);
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
@@ -282,7 +282,7 @@ void MobiController::handle_command_queue() {
       case COMMANDS::ULTRASONIC_SENSOR: {
         if (cmd.payload_length == 0 || cmd.payload[0] == 0 || (cmd.payload[0] & 0x80) != 0 || (cmd.payload[0] & 0x40) != 0) {
           debug_print("Got invalid ultrasonic sensor subdevice!\n");
-          this->send_status(STATUS::INVALID_PARAMETER);
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
@@ -293,7 +293,7 @@ void MobiController::handle_command_queue() {
       case COMMANDS::ENCODER: {
         if (cmd.payload_length == 0 || cmd.payload[0] == 0 || cmd.payload[0] > 0xF) {
           debug_print("Got invalid encoder subdevice!\n");
-          this->send_status(STATUS::INVALID_PARAMETER);
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
@@ -319,7 +319,7 @@ void MobiController::handle_command_queue() {
       case COMMANDS::USER_BUTTON: {
         if (cmd.payload_length > 1) {
           debug_print("Got invalid parameter for user button!\n");
-          this->send_status(STATUS::INVALID_PARAMETER);
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
@@ -336,7 +336,7 @@ void MobiController::handle_command_queue() {
             this->user_btn->set_mode(UserButtton::MODE::EXTERNAL);
         }
 
-        this->send_status(STATUS::OK);
+        this->send_status(STATUS_CODE::OK);
         break;
       }
 
@@ -344,7 +344,7 @@ void MobiController::handle_command_queue() {
         // Disable LED_STRIP command if the battery is low.
         // This is done so the user can not overwrite the warning lights.
         if (this->pwr_manager->is_battery_warning_triggered()) {
-          this->send_status(STATUS::BATTERY_WARNING);
+          this->send_status(STATUS_CODE::BATTERY_WARNING);
           break;
         }
 
@@ -408,7 +408,7 @@ void MobiController::handle_command_queue() {
 
             // Default: invalid preset id
             default: {
-              this->send_status(STATUS::INVALID_PARAMETER);
+              this->send_status(STATUS_CODE::INVALID_PARAMETER);
               break;
             }
           }
@@ -417,24 +417,24 @@ void MobiController::handle_command_queue() {
 
         } else {  // Error
           debug_print("Got invalid parameter for led strip!\n");
-          this->send_status(STATUS::INVALID_PARAMETER);
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
-        this->send_status(STATUS::OK);
+        this->send_status(STATUS_CODE::OK);
         break;
       }
 
       case COMMANDS::MOTOR_CONTROL: {
         if (cmd.payload_length > 6 || cmd.payload_length % 2 != 0) {
           debug_print("Got invalid parameter for motor control!\n");
-          this->send_status(STATUS::INVALID_PARAMETER);
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
         // Disable the MOTOR_CONTROL command if the battery is low.
         if (this->pwr_manager->is_battery_warning_triggered()) {
-          this->send_status(STATUS::BATTERY_WARNING);
+          this->send_status(STATUS_CODE::BATTERY_WARNING);
           break;
         }
 
@@ -452,9 +452,9 @@ void MobiController::handle_command_queue() {
 
         auto status = this->can_lib->drive(v[0], v[1], v[2]);
         if (status == HAL_OK)
-          this->send_status(STATUS::OK);
+          this->send_status(STATUS_CODE::OK);
         else
-          this->send_status(STATUS::ERROR);
+          this->send_status(STATUS_CODE::ERROR);
 
         break;
       }
@@ -462,7 +462,7 @@ void MobiController::handle_command_queue() {
       case COMMANDS::POZYX_POWER: {
         if (cmd.payload_length > 1 || (cmd.payload_length == 1 && cmd.payload[0] > 1)) {
           debug_print("Got invalid parameter for pozyx power!\n");
-          this->send_status(STATUS::INVALID_PARAMETER);
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
@@ -473,7 +473,7 @@ void MobiController::handle_command_queue() {
           this->pwr_manager->toggle_power_pozyx();
         }
 
-        this->send_status(STATUS::OK);
+        this->send_status(STATUS_CODE::OK);
         break;
       }
 
@@ -481,7 +481,7 @@ void MobiController::handle_command_queue() {
 
       default:
         debug_print("Queued unkown command!\n");
-        this->send_status(STATUS::UNKOWN_COMMAND);
+        this->send_status(STATUS_CODE::UNKOWN_COMMAND);
         break;
     }
   }

@@ -21,14 +21,6 @@ class MobiController {
 
   static void debug_print(const char *msg, ...);
 
-  enum class STATUS {
-    OK = 0,
-    ERROR,
-    INVALID_PARAMETER,
-    UNKOWN_COMMAND,
-    BATTERY_WARNING
-  };
-
   // commands
   enum class COMMANDS {
     IMU = 0x20,
@@ -88,6 +80,14 @@ class MobiController {
   enum class POZYX_SUB_DEVICES {
     POSITION = 0x1,
     ORIENTATION = 0x2,
+  };
+
+  enum class STATUS_CODE {
+    OK = 0x0,
+    ERROR = 0x1,
+    INVALID_PARAMETER = 0x2,
+    UNKOWN_COMMAND = 0x3,
+    BATTERY_WARNING = 0x4,
   };
 
   struct QueuedCommand {
@@ -162,7 +162,7 @@ class MobiController {
 
   void handle_basic_command(QueuedCommand cmd, DATA data);
   void handle_advanced_command(QueuedCommand cmd, DATA data);
-  void send_status(STATUS status);
+  void send_status(STATUS_CODE status);
 
   void handle_periodic_update();
   void handle_command_queue();
