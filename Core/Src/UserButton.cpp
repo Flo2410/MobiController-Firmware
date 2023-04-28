@@ -41,9 +41,12 @@ void UserButtton::handle_interrupt(uint16_t GPIO_Pin) {
 
   if (this->get_mode() == MODE::INTERNAL) {
     if (this->state) {
-      printf("Released\n");
+      MobiController::debug_print("UserButton: Released\n");
     } else {
-      printf("Pressed\n");
+      MobiController::debug_print("UserButton: Pressed\n");
+
+      // Toggle pozyx power
+      MobiController::mobictl().pwr_manager->toggle_power_pozyx();
     }
   } else if (this->get_mode() == MODE::EXTERNAL) {
     USB_COM_PORT::queue_byte(MobiController::DATA::USER_BUTTON, !this->state);
