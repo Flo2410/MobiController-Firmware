@@ -36,7 +36,7 @@ void MobiController::loop() {
   this->handle_command_queue();
   this->handle_data_frame_queue();
 
-  this->handle_count_to_1_min();
+  this->handle_count_to_30_sec();
 }
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
@@ -186,14 +186,14 @@ MobiController::MobiController() {
   this->handle_battery_check();
 }
 
-void MobiController::handle_count_to_1_min() {
+void MobiController::handle_count_to_30_sec() {
   uint32_t current_ms = HAL_GetTick();
 
   // check if current ms is less then last ms plus 1 min
   if (current_ms < this->last_tick_ms + 30000) return;
   this->last_tick_ms = current_ms;
 
-  // Code below is run every 60 sec
+  // Code below is run every 30 sec
 
   // Check battery warning
   this->handle_battery_check();

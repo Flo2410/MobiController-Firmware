@@ -181,7 +181,7 @@ class MobiController {
 
   uint32_t last_tick_ms = 0;
 
-  void handle_count_to_1_min();
+  void handle_count_to_30_sec();
 
   void handle_basic_command(QueuedCommand cmd, DATA data);
   void handle_advanced_command(QueuedCommand cmd, DATA data);
