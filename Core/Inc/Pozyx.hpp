@@ -6,6 +6,19 @@
 
 class Pozyx {
  public:
+  struct vector_t {
+    double w;
+    double x;
+    double y;
+    double z;
+  };
+
+  struct coordinates_t {
+    int32_t x;
+    int32_t y;
+    int32_t z;
+  };
+
   Pozyx(I2C_HandleTypeDef* hi2c);
 
   int reg_read(uint8_t reg_address, uint8_t* pData, int size);
@@ -14,6 +27,10 @@ class Pozyx {
   int get_firmware_version(uint8_t* version);
   int get_harware_version(uint8_t* version);
   int get_network_id(uint16_t* id);
+
+  int get_position(vector_t* coordinates);
+  int get_euler(vector_t* euler);
+  int get_quaternions(vector_t* quaternions);
 
  private:
   ~Pozyx();

@@ -60,6 +60,45 @@ int Pozyx::get_network_id(uint16_t* id) {
   return this->reg_read(POZYX_NETWORK_ID, (uint8_t*)id, 2);
 }
 
+int Pozyx::get_position(vector_t* pos) {
+  coordinates_t coords;
+  auto status = this->reg_read(POZYX_POS_X, (uint8_t*)&coords, sizeof(coordinates_t));
+  pos->w = 0;
+  pos->x = static_cast<float>(coords.x);
+  pos->y = static_cast<float>(coords.y);
+  pos->z = static_cast<float>(coords.z);
+
+  return status;
+}
+
+int Pozyx::get_euler(vector_t* euler) {
+  // the raw data are three 16bit values
+  int16_t raw_data[3] = {0, 0, 0};
+  int status = this->reg_read(POZYX_EUL_HEADING, (uint8_t*)&raw_data, 3 * sizeof(int16_t));
+
+  // convert the raw data from to euler angles in degrees
+  euler->w = 0;
+  euler->z = raw_data[0] / POZYX_EULER_DIV_DEG;
+  euler->x = raw_data[1] / POZYX_EULER_DIV_DEG;
+  euler->y = raw_data[2] / POZYX_EULER_DIV_DEG;
+
+  return status;
+}
+
+int Pozyx::get_quaternions(vector_t* quaternions) {
+  // the raw data are four 16bit values
+  int16_t raw_data[4] = {0, 0, 0, 0};
+  int status = this->reg_read(POZYX_QUAT_W, (uint8_t*)&raw_data, 4 * sizeof(int16_t));
+
+  // convert the raw data from to a quaternion
+  quaternions->w = raw_data[0] / POZYX_QUAT_DIV;
+  quaternions->x = raw_data[1] / POZYX_QUAT_DIV;
+  quaternions->y = raw_data[2] / POZYX_QUAT_DIV;
+  quaternions->z = raw_data[3] / POZYX_QUAT_DIV;
+
+  return status;
+}
+
 Pozyx::~Pozyx() {
 }
 
