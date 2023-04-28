@@ -48,8 +48,16 @@ int Pozyx::get_who_am_i(uint8_t* whoami) {
   return this->reg_read(POZYX_WHO_AM_I, whoami, 1);
 }
 
-int Pozyx::get_firmware_version(uint8_t* firmware) {
-  return this->reg_read(POZYX_FIRMWARE_VER, firmware, 1);
+int Pozyx::get_firmware_version(uint8_t* version) {
+  return this->reg_read(POZYX_FIRMWARE_VER, version, 1);
+}
+
+int Pozyx::get_harware_version(uint8_t* version) {
+  return this->reg_read(POZYX_HARDWARE_VER, version, 1);
+}
+
+int Pozyx::get_network_id(uint16_t* id) {
+  return this->reg_read(POZYX_NETWORK_ID, (uint8_t*)id, 2);
 }
 
 Pozyx::~Pozyx() {

@@ -56,7 +56,7 @@ class MobiController {
     BAT_VOLTAGE = 0x6,
     USER_BUTTON = 0x7,
     POZYX = 0x8,
-    POZYX_CONFIG = 0x9,
+    POZYX_INFO = 0x9,
     FIRMWARE_INFO = 0x3f,
   };
 

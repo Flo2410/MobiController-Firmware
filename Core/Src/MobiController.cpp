@@ -491,7 +491,7 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::POZYX_CONFIG: {
-        this->handle_basic_command(cmd, DATA::POZYX_CONFIG);
+        this->handle_basic_command(cmd, DATA::POZYX_INFO);
         break;
       }
 
@@ -664,10 +664,28 @@ void MobiController::handle_data_frame_queue() {
         break;
       }
 
-      case DATA::POZYX_CONFIG: {
-        uint8_t fw_version;
-        auto status = this->pozyx->get_firmware_version(&fw_version);
+      case DATA::POZYX_INFO: {
+        // Read Pozyx network id
+        uint16_t net_id;
+        uint8_t status = this->pozyx->get_network_id(&net_id);
+        if (status != 1) {
+          debug_print("Error getting pozyx network id\n");
+          this->send_status(STATUS_CODE::ERROR);
+          break;
+        }
 
+        // Read Pozyx firmware version
+        uint8_t fw_version;
+        status = this->pozyx->get_firmware_version(&fw_version);
+        if (status != 1) {
+          debug_print("Error getting pozyx firmware version\n");
+          this->send_status(STATUS_CODE::ERROR);
+          break;
+        }
+
+        // Read Pozyx hw version
+        uint8_t hw_version;
+        status = this->pozyx->get_harware_version(&hw_version);
         if (status != 1) {
           debug_print("Error getting pozyx firmware version\n");
           this->send_status(STATUS_CODE::ERROR);
@@ -675,10 +693,11 @@ void MobiController::handle_data_frame_queue() {
         }
 
         PayloadBuilder *pb = new PayloadBuilder();
-        pb->append_uint8(123);  // FIXME: Dummy tag id
+        pb->append_uint16(net_id);
         pb->append_uint8(fw_version);
+        pb->append_uint8(hw_version);
 
-        USB_COM_PORT::queue_payload(DATA::POZYX_CONFIG, pb);
+        USB_COM_PORT::queue_payload(DATA::POZYX_INFO, pb);
         delete pb;
         break;
       }

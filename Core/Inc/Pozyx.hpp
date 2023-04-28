@@ -11,7 +11,9 @@ class Pozyx {
   int reg_read(uint8_t reg_address, uint8_t* pData, int size);
 
   int get_who_am_i(uint8_t* whoami);
-  int get_firmware_version(uint8_t* firmware);
+  int get_firmware_version(uint8_t* version);
+  int get_harware_version(uint8_t* version);
+  int get_network_id(uint16_t* id);
 
  private:
   ~Pozyx();
