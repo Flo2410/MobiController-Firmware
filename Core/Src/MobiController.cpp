@@ -778,6 +778,7 @@ void MobiController::handle_data_frame_queue() {
       }
 
       default:
+        debug_print("Got invalid data in queue!");
         break;
     }
   }
