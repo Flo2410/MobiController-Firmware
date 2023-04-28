@@ -45,6 +45,13 @@ void PayloadBuilder::append_vector(Bno055::vector_t vec) {
   this->append_double(vec.z);
 }
 
+void PayloadBuilder::append_vector(Pozyx::vector_t vec) {
+  this->append_float(vec.w);
+  this->append_float(vec.x);
+  this->append_float(vec.y);
+  this->append_float(vec.z);
+}
+
 void PayloadBuilder::append_string(etl::string<255> str) {
   this->payload.insert(this->payload.end(), str.c_str(), str.c_str() + str.length());
 }

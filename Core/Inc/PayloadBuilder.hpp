@@ -2,6 +2,7 @@
 #define PAYLOAD_BUILDER_H_
 
 #include "Bno055.hpp"
+#include "Pozyx.hpp"
 #include "etl/string.h"
 #include "etl/vector.h"
 
@@ -17,6 +18,7 @@ class PayloadBuilder {
   void append_float(float number);
   void append_double(double number);
   void append_vector(Bno055::vector_t vec);
+  void append_vector(Pozyx::vector_t vec);
   void append_string(etl::string<255> str);
 
   uint8_t read_uint8();
