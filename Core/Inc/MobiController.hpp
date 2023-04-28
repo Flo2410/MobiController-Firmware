@@ -95,7 +95,8 @@ class MobiController {
 
   enum class POZYX_SUB_DEVICES {
     POSITION = 0x1,
-    ORIENTATION = 0x2,
+    EULER = 0x2,
+    QUATERNION = 0x4,
   };
 
   enum class STATUS_CODE {

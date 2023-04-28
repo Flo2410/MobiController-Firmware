@@ -490,6 +490,17 @@ void MobiController::handle_command_queue() {
         break;
       }
 
+      case COMMANDS::POZYX: {
+        if (cmd.payload_length == 0 || cmd.payload[0] == 0 || cmd.payload[0] > 0b111) {
+          debug_print("Got invalid pozyx subdevice!\n");
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
+          break;
+        }
+
+        this->handle_advanced_command(cmd, DATA::POZYX);
+        break;
+      }
+
       case COMMANDS::POZYX_CONFIG: {
         this->handle_basic_command(cmd, DATA::POZYX_INFO);
         break;
@@ -499,7 +510,6 @@ void MobiController::handle_command_queue() {
         this->handle_basic_command(cmd, DATA::FIRMWARE_INFO);
         break;
       }
-        // TODO: Handle all other commands
 
       default:
         debug_print("Queued unkown command!\n");
@@ -664,6 +674,51 @@ void MobiController::handle_data_frame_queue() {
         break;
       }
 
+      case DATA::POZYX: {
+        PayloadBuilder *pb = new PayloadBuilder();
+        pb->append_uint8(sub_device.sub_device_mask);
+
+        uint8_t status = 0;  // Pozyx status
+
+        switch (static_cast<POZYX_SUB_DEVICES>(sub_device.sub_device_mask)) {
+          case POZYX_SUB_DEVICES::POSITION: {
+            // Read Pozyx position
+            Pozyx::vector_t pos;
+            status = this->pozyx->get_position(&pos);
+
+            pb->append_vector(pos);
+            break;
+          }
+
+          case POZYX_SUB_DEVICES::EULER: {
+            // Read Pozyx euler
+            Pozyx::vector_t euler;
+            status = this->pozyx->get_euler(&euler);
+
+            pb->append_vector(euler);
+            break;
+          }
+
+          case POZYX_SUB_DEVICES::QUATERNION: {
+            // Pozyx read quaternions
+            Pozyx::vector_t quaternions;
+            status = this->pozyx->get_quaternions(&quaternions);
+
+            pb->append_vector(quaternions);
+            break;
+          }
+        }
+
+        if (status != 1) {
+          debug_print("Error getting pozyx data, status: %d\n", status);
+          this->send_status(STATUS_CODE::ERROR);
+        } else {
+          USB_COM_PORT::queue_payload(DATA::POZYX, pb);
+        }
+        delete pb;
+        break;
+      }
+
       case DATA::POZYX_INFO: {
         // Read Pozyx network id
         uint16_t net_id;
@@ -721,7 +776,7 @@ void MobiController::handle_data_frame_queue() {
         delete pb;
         break;
       }
-        // TODO: Read all other sensors
+
       default:
         break;
     }
