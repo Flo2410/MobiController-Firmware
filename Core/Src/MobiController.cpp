@@ -189,7 +189,7 @@ MobiController::MobiController() {
 void MobiController::handle_count_to_30_sec() {
   uint32_t current_ms = HAL_GetTick();
 
-  // check if current ms is less then last ms plus 1 min
+  // check if current ms is less then last ms plus 30 sec
   if (current_ms < this->last_tick_ms + 30000) return;
   this->last_tick_ms = current_ms;
 
@@ -341,6 +341,7 @@ void MobiController::handle_command_queue() {
           UserButtton::MODE mode = static_cast<UserButtton::MODE>(cmd.payload[0]);
           this->user_btn->set_mode(mode);
         } else {
+          // TODO: get state insted
           // Toggle the mode
           auto current_mode = this->user_btn->get_mode();
           if (current_mode == UserButtton::MODE::EXTERNAL)
@@ -483,6 +484,7 @@ void MobiController::handle_command_queue() {
           // Set the recived mode
           this->pwr_manager->set_power_pozyx(cmd.payload[0]);
         } else {
+          // TODO: get state insted
           this->pwr_manager->toggle_power_pozyx();
         }
 
