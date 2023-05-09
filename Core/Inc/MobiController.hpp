@@ -42,6 +42,7 @@ class MobiController {
     POZYX_POWER = 0x29,
     POZYX = 0x2a,
     POZYX_CONFIG = 0x2b,
+    DISABLE_ALL_INTERVALS = 0x3d,
     FIRMWARE_INFO = 0x3e,
   };
 

@@ -41,7 +41,7 @@ void MobiController::loop() {
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
   // Check that the recived id is a valid command.
-  if ((min_id >= 0x20 && min_id <= 0x2B) || min_id == 0x3e) {
+  if ((min_id >= 0x20 && min_id <= 0x2B) || min_id == 0x3e || min_id == 0x3d) {
     QueuedCommand cmd = {
         .min_id = static_cast<COMMANDS>(min_id),
         .payload = min_payload,
@@ -505,6 +505,12 @@ void MobiController::handle_command_queue() {
 
       case COMMANDS::POZYX_CONFIG: {
         this->handle_basic_command(cmd, DATA::POZYX_INFO);
+        break;
+      }
+
+      case COMMANDS::DISABLE_ALL_INTERVALS: {
+        this->periodic_updates.clear();
+        this->send_status(STATUS_CODE::OK);
         break;
       }
 
