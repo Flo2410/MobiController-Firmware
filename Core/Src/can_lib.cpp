@@ -1,7 +1,6 @@
 #include "can_lib.hpp"
 
 #include "can.h"
-#include "etl/endianness.h"
 #include "stm32l4xx.h"
 
 CAN_LIB::CAN_LIB(CAN_HandleTypeDef *can) {

@@ -18,16 +18,17 @@ void Encoder::handle_interrupts(uint16_t GPIO_Pin) {
 }
 
 void Encoder::handle_interrupt(uint16_t GPIO_Pin) {
+  // Check if the interrupt was triggered by "my" pin.
   if (GPIO_Pin != this->gpio_a_pin) return;
 
+  // Get the state of the B pin
   GPIO_PinState state_b = HAL_GPIO_ReadPin(this->gpio_b_port, this->gpio_b_pin);
 
+  // Check B pin state and adjust the counter accordingly.
   if (state_b == GPIO_PIN_SET)
     this->counter = this->counter + 1;
   else if (state_b == GPIO_PIN_RESET)
     this->counter = this->counter - 1;
-
-  // printf("counter interrupt: %d\n", this->counter);
 }
 
 uint16_t Encoder::get_counter(void) {
