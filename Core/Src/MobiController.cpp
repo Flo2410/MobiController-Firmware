@@ -30,13 +30,20 @@ void MobiController::debug_print(const char *format, ...) {
 }
 
 void MobiController::loop() {
-  min_poll(&min_ctx, {}, 0);
+  min_poll(&min_ctx, {}, 0);  // Run MIN Statemachine
 
   this->handle_periodic_update();
   this->handle_command_queue();
   this->handle_data_frame_queue();
 
   this->handle_count_to_30_sec();
+
+  bool remote_connected = (HAL_GetTick() - min_ctx.transport_fifo.last_received_anything_ms < 1000U);
+
+  if (!remote_connected) {
+    // TODO: debug_print("MIN Disconnected!\n");
+    // TODO: disable all periodic updates
+  }
 }
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
@@ -182,6 +189,8 @@ MobiController::MobiController() {
   LED_STRIP::clear_and_update();
   LED_STRIP::set_brightness(50);
 
+  // TODO: power on animation with led strip
+
   // Check the battery on startup
   this->handle_battery_check();
 }
@@ -225,8 +234,8 @@ void MobiController::handle_basic_command(QueuedCommand cmd, DATA data) {
   if (cmd.payload_length == 2) {
     PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
     uint16_t freq = pb->read_uint16();
-    delete pb;
     this->enable_periodic_update_if_disabled(data, freq);
+    delete pb;
     return;
   }
 
