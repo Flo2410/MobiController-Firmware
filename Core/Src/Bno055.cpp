@@ -243,7 +243,6 @@ void Bno055::set_calibration_data(calibration_data_t cal_data) {
   memcpy(buffer + 20, &cal_data.radius.mag, 2);
 
   for (uint8_t i = 0; i < 22; i++) {
-    // TODO(oliv4945): create multibytes write
     this->write_data(BNO055_ACC_OFFSET_X_LSB + i, buffer[i]);
   }
 
@@ -296,14 +295,14 @@ void Bno055::set_external_crystal_use(bool state) {
   HAL_Delay(700);
 }
 
-Bno055::vector_t Bno055::get_vector(uint8_t vec) {
-  set_page(0);
+Bno055::vector_t Bno055::get_vector(VECTOR_TYPE vec) {
+  this->set_page(0);
   uint8_t buffer[8];  // Quaternion need 8 bytes
 
   if (vec == VECTOR_QUATERNION)
-    read_data(vec, buffer, 8);
+    this->read_data(vec, buffer, 8);
   else
-    read_data(vec, buffer, 6);
+    this->read_data(vec, buffer, 6);
 
   double scale = 1;
 

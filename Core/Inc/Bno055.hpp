@@ -315,7 +315,7 @@ class Bno055 {
 
   void set_page(uint8_t page) { this->write_data(BNO055_PAGE_ID, page); }
   void set_external_crystal_use(bool state);
-  vector_t get_vector(uint8_t vec);
+  vector_t get_vector(VECTOR_TYPE vec);
 };
 
 #endif
