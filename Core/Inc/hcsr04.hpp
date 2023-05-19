@@ -26,7 +26,7 @@ class HCSR04 {
   uint32_t val_2 = 0;
   uint8_t overflow_count = 0;
   uint32_t difference = 0;
-  uint8_t is_first_captured = 0;  // is the first value captured ?
+  bool is_first_captured = false;  // is the first value captured ?
 
   void handle_interrupt(TIM_HandleTypeDef *htim);
   void handle_period_elapsed_interrupt(TIM_HandleTypeDef *htim);

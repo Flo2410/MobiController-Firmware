@@ -20,15 +20,15 @@ HCSR04::~HCSR04() {
   etl::remove(all_sensors.begin(), all_sensors.end(), this);
 }
 
-void HCSR04::read(void) {
+void HCSR04::read() {
   HAL_GPIO_WritePin(this->gpio_trig_port, this->gpio_trig_pin, GPIO_PIN_SET);    // pull the TRIG pin HIGH
   HAL_Delay(0.01);                                                               // wait for 10 us
   HAL_GPIO_WritePin(this->gpio_trig_port, this->gpio_trig_pin, GPIO_PIN_RESET);  // pull the TRIG pin low
   __HAL_TIM_ENABLE_IT(this->htim, this->channel.interrupt_channel);
 }
 
-float HCSR04::get_distance(void) {
-  return difference * 0.034 / 2;
+float HCSR04::get_distance() {
+  return this->difference * 0.034 / 2;
   // return this->difference / 58;
 }
 
@@ -45,24 +45,23 @@ void HCSR04::handle_period_elapsed_interrupts(TIM_HandleTypeDef *htim) {
 }
 
 void HCSR04::handle_interrupt(TIM_HandleTypeDef *htim) {
-  if (htim->Channel == this->channel.active_channel && this->htim == htim) {     // if the interrupt source is channel1
-    if (this->is_first_captured == 0) {                                          // if the first value is not captured
+  if (htim->Channel == this->channel.active_channel && this->htim == htim) {     // if the interrupt source is the correct channel
+    if (!this->is_first_captured) {                                              // if the first value is not captured
       this->val_1 = HAL_TIM_ReadCapturedValue(htim, this->channel.tim_channel);  // read the first value
-      this->is_first_captured = 1;                                               // set the first captured as true
+      this->is_first_captured = true;                                            // set the first captured as true
       this->overflow_count = 0;                                                  // reset overflow count
       // Now change the polarity to falling edge
       __HAL_TIM_SET_CAPTUREPOLARITY(htim, this->channel.tim_channel, TIM_INPUTCHANNELPOLARITY_FALLING);
     }
 
-    else if (this->is_first_captured == 1) {                                     // if the first is already captured
+    else {                                                                       // if the first is already captured
       this->val_2 = HAL_TIM_ReadCapturedValue(htim, this->channel.tim_channel);  // read second value
-      //__HAL_TIM_SET_COUNTER(htim, 0);                                // reset the counter
 
-      this->val_2 += this->overflow_count * (this->htim->Instance->ARR + 1);
+      this->val_2 += this->overflow_count * (this->htim->Instance->ARR + 1);  // handle overflow
 
       this->difference = this->val_2 - this->val_1;
 
-      this->is_first_captured = 0;  // set it back to false
+      this->is_first_captured = false;  // set it back to false
 
       // set polarity to rising edge
       __HAL_TIM_SET_CAPTUREPOLARITY(htim, this->channel.tim_channel, TIM_INPUTCHANNELPOLARITY_RISING);
