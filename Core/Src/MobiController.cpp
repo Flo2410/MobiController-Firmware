@@ -781,7 +781,7 @@ void MobiController::handle_data_frame_queue() {
         uint8_t hw_version;
         status = this->pozyx->get_harware_version(&hw_version);
         if (status != 1) {
-          debug_print("Error getting pozyx firmware version\n");
+          debug_print("Error getting pozyx harware version\n");
           this->send_status(STATUS_CODE::ERROR);
           break;
         }
