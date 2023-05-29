@@ -26,9 +26,9 @@ void Encoder::handle_interrupt(uint16_t GPIO_Pin) {
 
   // Check B pin state and adjust the counter accordingly.
   if (state_b == GPIO_PIN_SET)
-    this->counter = this->counter + 1;
+    this->counter++;
   else if (state_b == GPIO_PIN_RESET)
-    this->counter = this->counter - 1;
+    this->counter--;
 }
 
 uint16_t Encoder::get_counter(void) {
