@@ -19,7 +19,8 @@ struct COLOR_RGBW {
 enum ANIMATION_TYPE {
   BLINK = 0,
   ROTATE_LEFT,
-  ROTATE_RIGHT
+  ROTATE_RIGHT,
+  FILL
 };
 
 struct ANIMATION_CONFIG {
@@ -29,6 +30,7 @@ struct ANIMATION_CONFIG {
   uint8_t frame_count;
   uint8_t line_length;
   uint8_t line_count;
+  bool do_loop = true;
 };
 
 /*
@@ -77,6 +79,7 @@ void stop_animation();                                                          
 void start_animation(ANIMATION_CONFIG animation);                                                                                                 // Start the animation, only needed if the animation was stopped by the stop_animation() function;
 void driving_light();                                                                                                                             // Car-like head- and taillight
 void battery_warning_light();                                                                                                                     // Lights which are used to indicate a critical battery charge
+void power_on_animation();                                                                                                                        // Animation thats played when starting up.
 void beacon_rgbw(COLOR_RGBW color, uint8_t update_rate, uint8_t frame_count, uint8_t line_length, uint8_t line_count, bool rotate_left = false);  // Beacon light with RGBW color
 void blink(COLOR_RGBW color, uint8_t update_rate, uint8_t line_length = NUM_PIXELS, uint8_t line_count = 1);                                      // Blink the whole stip or sections in a color;
 

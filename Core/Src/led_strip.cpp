@@ -1,6 +1,7 @@
 
 #include "led_strip.hpp"
 
+#include "MobiController.hpp"
 #include "etl/scaled_rounding.h"
 #include "tim.h"
 
@@ -156,6 +157,31 @@ void handle_timer_interrupt(TIM_HandleTypeDef* htim) {
       }
 
       update();
+      break;
+    }
+
+    case ANIMATION_TYPE::FILL: {
+      if (!current_animation.do_loop && current_frame >= current_animation.frame_count) {
+        stop_animation();
+        break;
+      }
+
+      clear();
+
+      uint8_t start = 0;
+      uint8_t end = NUM_PIXELS - 1;
+
+      if (current_animation.frame_count <= NUM_PIXELS) {  // Only fill in
+        end = etl::round_half_up_unscaled<10, uint8_t>((NUM_PIXELS / current_animation.frame_count) * current_frame);
+      } else {  // fill in and clear
+        if (current_frame >= NUM_PIXELS)
+          start = etl::round_half_up_unscaled<10, uint8_t>((NUM_PIXELS / (current_animation.frame_count / 2)) * (current_frame - (current_animation.frame_count / 2)));
+        else
+          end = etl::round_half_up_unscaled<10, uint8_t>((NUM_PIXELS / (current_animation.frame_count / 2)) * current_frame);
+      }
+
+      fill_range_rgbw(start, end, current_animation.color);
+      update();
 
       break;
     }
@@ -199,6 +225,23 @@ void driving_light() {
 
 void battery_warning_light() {
   blink({255, 0, 0, 0}, 10, NUM_PIXELS, 1);
+}
+
+void power_on_animation() {
+  ANIMATION_CONFIG animation;
+  animation.color = {0, 255, 0, 0};
+  animation.type = ANIMATION_TYPE::FILL;
+  animation.frame_count = NUM_PIXELS * 2;
+  animation.update_rate = 1;
+  animation.do_loop = false;
+
+  MobiController::mobictl().pwr_manager->set_power_led(true);
+  start_animation(animation);
+
+  HAL_Delay(1000);  // FIXME: get rid of this delay
+
+  clear_and_update();
+  MobiController::mobictl().pwr_manager->set_power_led(false);
 }
 
 void beacon_rgbw(COLOR_RGBW color, uint8_t update_rate, uint8_t frame_count, uint8_t line_length, uint8_t line_count, bool rotate_left) {
