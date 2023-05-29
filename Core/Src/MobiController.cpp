@@ -9,6 +9,8 @@
 #include "can_lib.hpp"
 #include "cpp_main.hpp"
 #include "encoder.hpp"
+#include "etl/basic_format_spec.h"
+#include "etl/string.h"
 #include "etl/to_string.h"
 #include "etl/vector.h"
 #include "hcsr04.hpp"
@@ -78,6 +80,16 @@ void MobiController::enable_periodic_update(SubDevice sub_device, uint16_t inter
       .sub_device = sub_device,
       .interval = interval,
   };
+  etl::string<255> str = "Enable periodic update for ID: ";
+  etl::to_string(static_cast<uint8_t>(sub_device.min_id), str, etl::format_spec().hex().show_base(true), true);
+  if (sub_device.sub_device_mask != 0) {
+    str.append(" with subdevice: ");
+    etl::to_string(sub_device.sub_device_mask, str, etl::format_spec().binary().show_base(true), true);
+  }
+  str.append(" and interval: ");
+  etl::to_string(interval, str, etl::format_spec().decimal(), true);
+  str.append(" ms\n");
+  debug_print(str.c_str());
   this->periodic_updates.push_back(periodic_update);
 }
 void MobiController::enable_periodic_update(DATA data, uint16_t interval) {
@@ -90,7 +102,17 @@ void MobiController::enable_periodic_update(DATA data, uint16_t interval) {
 
 void MobiController::disable_periodic_update(SubDevice sub_device) {
   for (PeriodicUpdate *it = this->periodic_updates.begin(); it < this->periodic_updates.end(); ++it) {
-    if (it->sub_device.min_id == sub_device.min_id && it->sub_device.sub_device_mask == sub_device.sub_device_mask) this->periodic_updates.erase(it);
+    if (it->sub_device.min_id == sub_device.min_id && it->sub_device.sub_device_mask == sub_device.sub_device_mask) {
+      etl::string<255> str = "Disable periodic update for ID: ";
+      etl::to_string(static_cast<uint8_t>(it->sub_device.min_id), str, etl::format_spec().hex().show_base(true), true);
+      if (it->sub_device.sub_device_mask != 0) {
+        str.append(" for subdevice: ");
+        etl::to_string(it->sub_device.sub_device_mask, str, etl::format_spec().binary().show_base(true), true);
+      }
+      str.append("\n");
+      debug_print(str.c_str());
+      this->periodic_updates.erase(it);
+    }
   }
 }
 
@@ -272,7 +294,6 @@ void MobiController::handle_periodic_update() {
     // Check if should be sent
     if (time_now_ms >= it->last_sent_ms + it->interval) {
       debug_print("Sending periodic update of ID: %#.2x\n", it->sub_device.min_id);
-
       it->last_sent_ms = time_now_ms;
       this->queue_data_frame(it->sub_device);
     }
@@ -519,6 +540,7 @@ void MobiController::handle_command_queue() {
 
       case COMMANDS::DISABLE_ALL_INTERVALS: {
         this->periodic_updates.clear();
+        debug_print("Disabled all periodic updates\n");
         this->send_status(STATUS_CODE::OK);
         break;
       }
