@@ -53,8 +53,7 @@ void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, u
   if ((min_id >= 0x20 && min_id <= 0x2B) || min_id == 0x3e || min_id == 0x3d) {
     QueuedCommand cmd = {
         .min_id = static_cast<COMMANDS>(min_id),
-        .payload = min_payload,
-        .payload_length = len_payload};
+        .payload = etl::vector<uint8_t, MAX_PAYLOAD>(min_payload, min_payload + len_payload)};
     this->command_queue.push(cmd);
     return;
   }
@@ -231,16 +230,17 @@ void MobiController::handle_count_to_30_sec() {
 }
 
 void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
+  PayloadBuilder *pb = new PayloadBuilder(cmd.payload);
+
   // Check which sub devices
-  auto sub_device_masks = extract_subdevices_from_byte(cmd.payload[0]);
+  auto sub_device_masks = extract_subdevices_from_byte(pb->read_uint8());
 
   // Go through all subdevices
   for (auto it = sub_device_masks.begin(); it < sub_device_masks.end(); ++it) {
     SubDevice sub_device = {.min_id = data,
                             .sub_device_mask = *it};
 
-    if (cmd.payload_length == 3) {
-      PayloadBuilder *pb = new PayloadBuilder(cmd.payload + 1, cmd.payload_length - 1);  // Payload builder without first byte
+    if (cmd.payload.size() == 3) {
       uint16_t freq = pb->read_uint16();
       this->enable_periodic_update_if_disabled(sub_device, freq);
       delete pb;
@@ -253,8 +253,8 @@ void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
 }
 
 void MobiController::handle_basic_command(QueuedCommand cmd, DATA data) {
-  if (cmd.payload_length == 2) {
-    PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
+  if (cmd.payload.size() == 2) {
+    PayloadBuilder *pb = new PayloadBuilder(cmd.payload);
     uint16_t freq = pb->read_uint16();
     this->enable_periodic_update_if_disabled(data, freq);
     delete pb;
@@ -312,7 +312,7 @@ void MobiController::handle_command_queue() {
 
     switch (cmd.min_id) {
       case COMMANDS::IMU: {
-        if (cmd.payload_length == 0 || cmd.payload[0] == 0 || (cmd.payload[0] | 0b01111111) == 0xff) {
+        if (cmd.payload.size() == 0 || cmd.payload[0] == 0 || (cmd.payload[0] | 0b01111111) == 0xff) {
           debug_print("Got invalid IMU subdevice!\n");
           this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
@@ -323,7 +323,7 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::ULTRASONIC_SENSOR: {
-        if (cmd.payload_length == 0 || cmd.payload[0] == 0 || (cmd.payload[0] & 0x80) != 0 || (cmd.payload[0] & 0x40) != 0) {
+        if (cmd.payload.size() == 0 || cmd.payload[0] == 0 || (cmd.payload[0] & 0x80) != 0 || (cmd.payload[0] & 0x40) != 0) {
           debug_print("Got invalid ultrasonic sensor subdevice!\n");
           this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
@@ -334,7 +334,7 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::ENCODER: {
-        if (cmd.payload_length == 0 || cmd.payload[0] == 0 || cmd.payload[0] > 0xF) {
+        if (cmd.payload.size() == 0 || cmd.payload[0] == 0 || cmd.payload[0] > 0xF) {
           debug_print("Got invalid encoder subdevice!\n");
           this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
@@ -360,13 +360,13 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::USER_BUTTON: {
-        if (cmd.payload_length > 1) {
+        if (cmd.payload.size() > 1) {
           debug_print("Got invalid parameter for user button!\n");
           this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
-        if (cmd.payload_length == 1) {
+        if (cmd.payload.size() == 1) {
           // Set the recived mode
           UserButtton::MODE mode = static_cast<UserButtton::MODE>(cmd.payload[0]);
           this->user_btn->set_mode(mode);
@@ -392,18 +392,18 @@ void MobiController::handle_command_queue() {
           break;
         }
 
-        if (cmd.payload_length == 0) {  // turn off the leds
+        if (cmd.payload.size() == 0) {  // turn off the leds
           LED_STRIP::stop_animation();
           LED_STRIP::clear_and_update();
           this->pwr_manager->set_power_led(false);
 
-        } else if (cmd.payload_length == 1 || (cmd.payload_length >= 5 && cmd.payload_length <= 10)) {  // Select preset
-          PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
+        } else if (cmd.payload.size() == 1 || (cmd.payload.size() >= 5 && cmd.payload.size() <= 10)) {  // Select preset
+          PayloadBuilder *pb = new PayloadBuilder(cmd.payload);
           ANIMATION_PRESET preset = static_cast<ANIMATION_PRESET>(pb->read_uint8());
 
           LED_STRIP::COLOR_RGBW color = {255, 255, 0, 0};
 
-          if (cmd.payload_length >= 5) {
+          if (cmd.payload.size() >= 5) {
             color.r = pb->read_uint8();
             color.g = pb->read_uint8();
             color.b = pb->read_uint8();
@@ -423,11 +423,11 @@ void MobiController::handle_command_queue() {
 
             // Beacon
             case ANIMATION_PRESET::BEACON: {
-              uint8_t update_rate = cmd.payload_length >= 6 ? pb->read_uint8() : 5;
-              uint8_t line_length = cmd.payload_length >= 7 ? pb->read_uint8() : 4;
-              uint8_t line_count = cmd.payload_length >= 8 ? pb->read_uint8() : 4;
-              uint8_t rotate_left = cmd.payload_length >= 9 ? static_cast<bool>(pb->read_uint8()) : false;
-              uint8_t frame_count = cmd.payload_length == 10 ? pb->read_uint8() : NUM_PIXELS;
+              uint8_t update_rate = cmd.payload.size() >= 6 ? pb->read_uint8() : 5;
+              uint8_t line_length = cmd.payload.size() >= 7 ? pb->read_uint8() : 4;
+              uint8_t line_count = cmd.payload.size() >= 8 ? pb->read_uint8() : 4;
+              uint8_t rotate_left = cmd.payload.size() >= 9 ? static_cast<bool>(pb->read_uint8()) : false;
+              uint8_t frame_count = cmd.payload.size() == 10 ? pb->read_uint8() : NUM_PIXELS;
 
               LED_STRIP::beacon_rgbw(color, update_rate, frame_count, line_length, line_count, rotate_left);
               break;
@@ -435,9 +435,9 @@ void MobiController::handle_command_queue() {
 
             // Blink
             case ANIMATION_PRESET::BLINK: {
-              uint8_t update_rate = cmd.payload_length >= 6 ? pb->read_uint8() : 50;
-              uint8_t line_length = cmd.payload_length >= 7 ? pb->read_uint8() : NUM_PIXELS;
-              uint8_t line_count = cmd.payload_length == 8 ? pb->read_uint8() : 1;
+              uint8_t update_rate = cmd.payload.size() >= 6 ? pb->read_uint8() : 50;
+              uint8_t line_length = cmd.payload.size() >= 7 ? pb->read_uint8() : NUM_PIXELS;
+              uint8_t line_count = cmd.payload.size() == 8 ? pb->read_uint8() : 1;
 
               LED_STRIP::blink(color, update_rate, line_length, line_count);
               break;
@@ -470,7 +470,7 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::MOTOR_CONTROL: {
-        if (cmd.payload_length > 6 || cmd.payload_length % 2 != 0) {
+        if (cmd.payload.size() > 6 || cmd.payload.size() % 2 != 0) {
           debug_print("Got invalid parameter for motor control!\n");
           this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
@@ -484,8 +484,8 @@ void MobiController::handle_command_queue() {
 
         int16_t v[3] = {};
 
-        if (cmd.payload_length != 0) {
-          PayloadBuilder *pb = new PayloadBuilder(cmd.payload, cmd.payload_length);
+        if (cmd.payload.size() != 0) {
+          PayloadBuilder *pb = new PayloadBuilder(cmd.payload);
 
           for (size_t i = 0; i < 3; ++i) {
             if (pb->size() == 0) break;
@@ -504,13 +504,13 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::POZYX_POWER: {
-        if (cmd.payload_length > 1 || (cmd.payload_length == 1 && cmd.payload[0] > 1)) {
+        if (cmd.payload.size() > 1 || (cmd.payload.size() == 1 && cmd.payload[0] > 1)) {
           debug_print("Got invalid parameter for pozyx power!\n");
           this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;
         }
 
-        if (cmd.payload_length == 1) {
+        if (cmd.payload.size() == 1) {
           // Set the recived mode
           this->pwr_manager->set_power_pozyx(cmd.payload[0]);
         } else {
@@ -523,7 +523,7 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::POZYX: {
-        if (cmd.payload_length == 0 || cmd.payload[0] == 0 || cmd.payload[0] > 0b111) {
+        if (cmd.payload.size() == 0 || cmd.payload[0] == 0 || cmd.payload[0] > 0b111) {
           debug_print("Got invalid pozyx subdevice!\n");
           this->send_status(STATUS_CODE::INVALID_PARAMETER);
           break;

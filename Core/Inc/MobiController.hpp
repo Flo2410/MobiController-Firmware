@@ -114,8 +114,7 @@ class MobiController {
 
   struct QueuedCommand {
     COMMANDS min_id;
-    uint8_t const *payload;
-    uint8_t payload_length;
+    etl::vector<uint8_t, MAX_PAYLOAD> payload;
   };
 
   struct SubDevice {

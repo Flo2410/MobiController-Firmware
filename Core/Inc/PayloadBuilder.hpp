@@ -5,11 +5,13 @@
 #include "Pozyx.hpp"
 #include "etl/string.h"
 #include "etl/vector.h"
+#include "min.h"
 
 class PayloadBuilder {
  public:
   PayloadBuilder();
   PayloadBuilder(uint8_t const* bytes, uint8_t length);
+  PayloadBuilder(etl::vector<uint8_t, MAX_PAYLOAD> payload);
   ~PayloadBuilder();
 
   void append_uint8(uint8_t number);

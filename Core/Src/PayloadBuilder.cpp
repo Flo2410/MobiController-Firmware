@@ -2,12 +2,18 @@
 
 #include "etl/memory.h"
 #include "etl/string.h"
+#include "etl/vector.h"
+#include "min.h"
 
 PayloadBuilder::PayloadBuilder() {
 }
 
 PayloadBuilder::PayloadBuilder(uint8_t const* bytes, uint8_t length) {
   this->payload.insert(this->payload.begin(), bytes, bytes + length);
+}
+
+PayloadBuilder::PayloadBuilder(etl::vector<uint8_t, MAX_PAYLOAD> payload) {
+  this->payload = payload;
 }
 
 void PayloadBuilder::append_uint8(uint8_t number) {
