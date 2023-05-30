@@ -1,8 +1,8 @@
 #include "can_lib.hpp"
 
 #include "can.h"
-#include "stm32l4xx.h"
 #include "etl/algorithm.h"
+#include "stm32l4xx.h"
 
 CAN_LIB::CAN_LIB(CAN_HandleTypeDef *can) {
   this->can = can;
@@ -42,8 +42,8 @@ HAL_StatusTypeDef CAN_LIB::send_stop() {
  */
 HAL_StatusTypeDef CAN_LIB::drive(int16_t vx, int16_t vy, int16_t vphi) {
   vx = etl::clamp<int16_t>(vx, -3276, 3276);
-  vy = etl::clamp<int16_t>(vx, -3276, 3276);
-  vphi = etl::clamp<int16_t>(vx, -3276, 3276);
+  vy = etl::clamp<int16_t>(vy, -3276, 3276);
+  vphi = etl::clamp<int16_t>(vphi, -3276, 3276);
 
   int16_t val_x = vx * 10;  // m/s * 10000 -> mm/s * 10
   uint16_t x_twos = twos_complement(val_x);
