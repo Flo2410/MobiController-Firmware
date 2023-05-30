@@ -58,6 +58,7 @@ class MobiController {
     USER_BUTTON = 0x7,
     POZYX = 0x8,
     POZYX_INFO = 0x9,
+    POZYX_POWER_STATE = 0xa,
     FIRMWARE_INFO = 0x3f,
   };
 

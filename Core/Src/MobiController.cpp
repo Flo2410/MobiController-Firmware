@@ -513,12 +513,12 @@ void MobiController::handle_command_queue() {
         if (cmd.payload.size() == 1) {
           // Set the recived mode
           this->pwr_manager->set_power_pozyx(cmd.payload[0]);
+          this->send_status(STATUS_CODE::OK);
         } else {
-          // TODO: get state insted
-          this->pwr_manager->toggle_power_pozyx();
+          // get state
+          this->queue_data_frame(DATA::POZYX_POWER_STATE);
         }
 
-        this->send_status(STATUS_CODE::OK);
         break;
       }
 
@@ -793,6 +793,11 @@ void MobiController::handle_data_frame_queue() {
 
         USB_COM_PORT::queue_payload(DATA::POZYX_INFO, pb);
         delete pb;
+        break;
+      }
+
+      case DATA::POZYX_POWER_STATE: {
+        USB_COM_PORT::queue_byte(DATA::POZYX_POWER_STATE, this->pwr_manager->get_power_pozyx());
         break;
       }
 
