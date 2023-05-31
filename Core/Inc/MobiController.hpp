@@ -1,7 +1,7 @@
 #ifndef MOBI_CONTROLLER_H_
 #define MOBI_CONTROLLER_H_
 
-#define FIRMWARE_VERSION "v1.0"
+#define FIRMWARE_VERSION "v1.0.1"
 
 #include "Bno055.hpp"
 #include "PowerManager.hpp"
