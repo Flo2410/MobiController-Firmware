@@ -210,10 +210,12 @@ MobiController::MobiController() {
   LED_STRIP::clear_and_update();
   LED_STRIP::set_brightness(50);
 
-  // TODO: power on animation with led strip
-
   // Check the battery on startup
   this->handle_battery_check();
+
+  // power on animation with led strip
+  this->pwr_manager->set_power_led(true);
+  LED_STRIP::power_on_animation();
 }
 
 void MobiController::handle_count_to_30_sec() {
