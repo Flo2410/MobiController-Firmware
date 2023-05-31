@@ -28,8 +28,8 @@ struct ANIMATION_CONFIG {
   uint8_t update_rate;  // multiples of 10ms
   ANIMATION_TYPE type;
   uint8_t frame_count;
-  uint8_t line_length;
-  uint8_t line_count;
+  uint8_t line_length = 0;
+  uint8_t line_count = 0;
   bool do_loop = true;
 };
 
@@ -82,6 +82,7 @@ void battery_warning_light();                                                   
 void power_on_animation();                                                                                                                        // Animation thats played when starting up.
 void beacon_rgbw(COLOR_RGBW color, uint8_t update_rate, uint8_t frame_count, uint8_t line_length, uint8_t line_count, bool rotate_left = false);  // Beacon light with RGBW color
 void blink(COLOR_RGBW color, uint8_t update_rate, uint8_t line_length = NUM_PIXELS, uint8_t line_count = 1);                                      // Blink the whole stip or sections in a color;
+void fill(COLOR_RGBW color, uint8_t update_rate, uint8_t frame_count, bool do_loop);
 
 }  // namespace LED_STRIP
 

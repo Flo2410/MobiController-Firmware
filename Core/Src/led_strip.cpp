@@ -161,23 +161,23 @@ void handle_timer_interrupt(TIM_HandleTypeDef* htim) {
     }
 
     case ANIMATION_TYPE::FILL: {
-      if (!current_animation.do_loop && current_frame >= current_animation.frame_count) {
+      if (!current_animation.do_loop && current_frame >= current_animation.frame_count - 1) {
         stop_animation();
+        MobiController::mobictl().pwr_manager->set_power_led(false);
         break;
       }
 
       clear();
 
       uint8_t start = 0;
-      uint8_t end = NUM_PIXELS - 1;
+      uint8_t end = NUM_PIXELS;
+      uint8_t half_frames = current_animation.frame_count / 2;
+      uint8_t step_size = NUM_PIXELS / half_frames;
 
-      if (current_animation.frame_count <= NUM_PIXELS) {  // Only fill in
-        end = etl::round_half_up_unscaled<10, uint8_t>((NUM_PIXELS / current_animation.frame_count) * current_frame);
-      } else {  // fill in and clear
-        if (current_frame >= NUM_PIXELS)
-          start = etl::round_half_up_unscaled<10, uint8_t>((NUM_PIXELS / (current_animation.frame_count / 2)) * (current_frame - (current_animation.frame_count / 2)));
-        else
-          end = etl::round_half_up_unscaled<10, uint8_t>((NUM_PIXELS / (current_animation.frame_count / 2)) * current_frame);
+      if (current_frame < half_frames) {  // first half of the animation
+        end = step_size * current_frame;
+      } else {  // second half
+        start = step_size * (current_frame - half_frames);
       }
 
       fill_range_rgbw(start, end, current_animation.color);
@@ -228,20 +228,8 @@ void battery_warning_light() {
 }
 
 void power_on_animation() {
-  ANIMATION_CONFIG animation;
-  animation.color = {0, 255, 0, 0};
-  animation.type = ANIMATION_TYPE::FILL;
-  animation.frame_count = NUM_PIXELS * 2;
-  animation.update_rate = 1;
-  animation.do_loop = false;
-
-  MobiController::mobictl().pwr_manager->set_power_led(true);
-  start_animation(animation);
-
-  HAL_Delay(1000);  // FIXME: get rid of this delay
-
-  clear_and_update();
-  MobiController::mobictl().pwr_manager->set_power_led(false);
+  // MobiController::mobictl().pwr_manager->set_power_led(true);
+  fill({255, 255, 0, 0}, 1, NUM_PIXELS * 2, false);
 }
 
 void beacon_rgbw(COLOR_RGBW color, uint8_t update_rate, uint8_t frame_count, uint8_t line_length, uint8_t line_count, bool rotate_left) {
@@ -264,6 +252,17 @@ void blink(COLOR_RGBW color, uint8_t update_rate, uint8_t line_length, uint8_t l
   animation.update_rate = update_rate;
   animation.line_length = line_length;
   animation.line_count = line_count;
+
+  start_animation(animation);
+}
+
+void fill(COLOR_RGBW color, uint8_t update_rate, uint8_t frame_count, bool do_loop) {
+  ANIMATION_CONFIG animation;
+  animation.type = ANIMATION_TYPE::FILL;
+  animation.frame_count = frame_count;
+  animation.color = color;
+  animation.update_rate = update_rate;
+  animation.do_loop = do_loop;
 
   start_animation(animation);
 }
