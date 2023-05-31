@@ -166,6 +166,8 @@ class MobiController {
   void disable_periodic_update_if_enabled(SubDevice sub_device);
   void disable_periodic_update_if_enabled(DATA data);
 
+  void disable_all_periodic_updates(void);
+
   bool is_periodic_update_enabled(SubDevice sub_device);
   bool is_periodic_update_enabled(DATA data);
 
@@ -181,6 +183,7 @@ class MobiController {
   etl::vector<PeriodicUpdate, 20> periodic_updates;
 
   uint32_t last_tick_ms = 0;
+  bool remote_connected = false;
 
   void handle_count_to_30_sec();
 

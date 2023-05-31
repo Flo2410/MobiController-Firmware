@@ -40,11 +40,23 @@ void MobiController::loop() {
 
   this->handle_count_to_30_sec();
 
-  bool remote_connected = (HAL_GetTick() - min_ctx.transport_fifo.last_received_anything_ms < 1000U);
+  // Check if a remote is connected
+  bool remote_connected = false;
+  uint32_t tick = HAL_GetTick();
+  if (tick > 1000)
+    remote_connected = (tick - min_ctx.transport_fifo.last_received_anything_ms < 1000U);
 
-  if (!remote_connected) {
-    // TODO: debug_print("MIN Disconnected!\n");
-    // TODO: disable all periodic updates
+  if (!remote_connected && this->remote_connected) {
+    debug_print("MIN Disconnected!\n");
+    this->disable_all_periodic_updates();
+    this->remote_connected = false;
+    this->pwr_manager->set_power_led(true);
+    LED_STRIP::fill({255, 0, 0, 0}, 1, NUM_PIXELS * 2, false);
+  } else if (remote_connected && !this->remote_connected) {
+    debug_print("MIN Connected!\n");
+    this->remote_connected = true;
+    this->pwr_manager->set_power_led(true);
+    LED_STRIP::fill({0, 255, 0, 0}, 1, NUM_PIXELS * 2, false);
   }
 }
 
@@ -121,6 +133,11 @@ void MobiController::disable_periodic_update(DATA data) {
       .sub_device_mask = 0,
   };
   this->disable_periodic_update(sub_device);
+}
+
+void MobiController::disable_all_periodic_updates() {
+  this->periodic_updates.clear();
+  debug_print("Disabled all periodic updates\n");
 }
 
 void MobiController::enable_periodic_update_if_disabled(SubDevice sub_device, uint16_t interval) {
@@ -542,8 +559,7 @@ void MobiController::handle_command_queue() {
       }
 
       case COMMANDS::DISABLE_ALL_INTERVALS: {
-        this->periodic_updates.clear();
-        debug_print("Disabled all periodic updates\n");
+        this->disable_all_periodic_updates();
         this->send_status(STATUS_CODE::OK);
         break;
       }
