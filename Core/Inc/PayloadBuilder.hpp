@@ -29,6 +29,7 @@ class PayloadBuilder {
 
   uint8_t* get_payload();
   size_t size();
+  bool is_empty();
 
  private:
   etl::vector<uint8_t, 255> payload;

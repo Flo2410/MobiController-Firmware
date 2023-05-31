@@ -236,6 +236,9 @@ void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
 
   // Check which sub devices
   auto sub_device_masks = extract_subdevices_from_byte(pb->read_uint8());
+  uint16_t freq = 1000;  // Default freq is 1 sec, this should never be used.
+  if (!pb->is_empty()) freq = pb->read_uint16();
+  delete pb;
 
   // Go through all subdevices
   for (auto it = sub_device_masks.begin(); it < sub_device_masks.end(); ++it) {
@@ -243,9 +246,7 @@ void MobiController::handle_advanced_command(QueuedCommand cmd, DATA data) {
                             .sub_device_mask = *it};
 
     if (cmd.payload.size() == 3) {
-      uint16_t freq = pb->read_uint16();
       this->enable_periodic_update_if_disabled(sub_device, freq);
-      delete pb;
       continue;
     }
 

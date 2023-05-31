@@ -91,6 +91,10 @@ size_t PayloadBuilder::size() {
   return this->payload.size();
 }
 
+bool PayloadBuilder::is_empty() {
+  return this->payload.size() == 0;
+}
+
 PayloadBuilder::~PayloadBuilder() {
   this->payload.clear();
 }
