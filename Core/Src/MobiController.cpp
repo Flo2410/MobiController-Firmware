@@ -50,13 +50,13 @@ void MobiController::loop() {
     debug_print("MIN Disconnected!\n");
     this->disable_all_periodic_updates();
     this->remote_connected = false;
-    this->pwr_manager->set_power_led(true);
-    LED_STRIP::fill({255, 0, 0, 0}, 1, NUM_PIXELS * 2, false);
+    // this->pwr_manager->set_power_led(true);
+    // LED_STRIP::fill({255, 0, 0, 0}, 1, NUM_PIXELS * 2, false);
   } else if (remote_connected && !this->remote_connected) {
     debug_print("MIN Connected!\n");
     this->remote_connected = true;
-    this->pwr_manager->set_power_led(true);
-    LED_STRIP::fill({0, 255, 0, 0}, 1, NUM_PIXELS * 2, false);
+    // this->pwr_manager->set_power_led(true);
+    // LED_STRIP::fill({0, 255, 0, 0}, 1, NUM_PIXELS * 2, false);
   }
 }
 
