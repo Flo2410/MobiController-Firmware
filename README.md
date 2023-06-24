@@ -7,7 +7,7 @@ Dies ist die Firmware für den Mobi des Robotikstudiengangs der FHWN.
 Zur Konfiguration des Projekts wird die Software [STM32 CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) benötigt. </br>
 Als Entwicklungsumgebung wird VS Code mit der Erweiterung [stm32-for-vscode](https://marketplace.visualstudio.com/items?itemName=bmd.stm32-for-vscode) verwendet.
 
-## Flashen von einem Release
+## Flashen eines Release
 
 Um einen vorhandenen Release zu flashen, muss zuerst die entsprechende `MobiController-Firmware.elf` von der [Releaseseite](https://github.com/Flo2410/MobiController-Firmware/releases) heruntergeladen werden.
 Anschließend muss die ELF Datei in den Build-Ornder verschoben werden, sodass der Dateipfad `./build/MobiController-Firmware.elf` lautet.
