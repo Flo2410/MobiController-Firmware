@@ -48,7 +48,7 @@ void MobiController::loop() {
 
   if (!remote_connected && this->remote_connected) {
     debug_print("MIN Disconnected!\n");
-    this->disable_all_periodic_updates();
+    // this->disable_all_periodic_updates();
     this->remote_connected = false;
     // this->pwr_manager->set_power_led(true);
     // LED_STRIP::fill({255, 0, 0, 0}, 1, NUM_PIXELS * 2, false);
