@@ -62,7 +62,7 @@ void MobiController::loop() {
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
   // Check that the recived id is a valid command.
-  if ((min_id >= 0x20 && min_id <= 0x2C) || min_id == 0x3e || min_id == 0x3d) {
+  if ((min_id >= 0x20 && min_id <= 0x2E) || min_id == 0x3e || min_id == 0x3d) {
     QueuedCommand cmd = {
         .min_id = static_cast<COMMANDS>(min_id),
         .payload = etl::vector<uint8_t, MAX_PAYLOAD>(min_payload, min_payload + len_payload)};
@@ -563,6 +563,48 @@ void MobiController::handle_command_queue() {
         break;
       }
 
+      case COMMANDS::IMU_GET_CALIBRATION_DATA: {
+        this->queue_data_frame(DATA::IMU_CALIBRATION_DATA);
+        break;
+      }
+
+      case COMMANDS::IMU_SET_CALIBRATION_DATA: {
+        if (cmd.payload.size() < 11) {
+          debug_print("Got invalid imu calibration data!\n");
+          this->send_status(STATUS_CODE::INVALID_PARAMETER);
+          break;
+        }
+
+        PayloadBuilder *pb = new PayloadBuilder(cmd.payload);
+
+        Bno055::vector_xyz_int16_t gyro = {
+            .x = pb->read_int16(),
+            .y = pb->read_int16(),
+            .z = pb->read_int16()};
+
+        Bno055::vector_xyz_int16_t mag = {
+            .x = pb->read_int16(),
+            .y = pb->read_int16(),
+            .z = pb->read_int16()};
+
+        Bno055::vector_xyz_int16_t accel = {
+            .x = pb->read_int16(),
+            .y = pb->read_int16(),
+            .z = pb->read_int16()};
+
+        Bno055::calibration_data_t calib_data = {
+            .offset = {
+                .gyro = gyro,
+                .mag = mag,
+                .accel = accel,
+            },
+            .radius = {.mag = pb->read_uint16(), .accel = pb->read_uint16()}};
+
+        this->imu->set_calibration_data(calib_data);
+        this->send_status(STATUS_CODE::OK);
+        break;
+      }
+
       case COMMANDS::DISABLE_ALL_INTERVALS: {
         this->disable_all_periodic_updates();
         this->send_status(STATUS_CODE::OK);
@@ -835,6 +877,24 @@ void MobiController::handle_data_frame_queue() {
         pb->append_uint8(calib_state.accel);
 
         USB_COM_PORT::queue_payload(DATA::IMU_CALIBRATION_STATUS, pb);
+        delete pb;
+        break;
+      }
+
+      case DATA::IMU_CALIBRATION_DATA: {
+        PayloadBuilder *pb = new PayloadBuilder();
+
+        Bno055::calibration_data_t calib_data = this->imu->get_calibration_data();
+        Bno055::calibration_offset_t offset = calib_data.offset;
+        Bno055::calibration_radius_t radius = calib_data.radius;
+
+        pb->append_vector(offset.gyro);
+        pb->append_vector(offset.mag);
+        pb->append_vector(offset.accel);
+        pb->append_uint16(radius.mag);
+        pb->append_uint16(radius.accel);
+
+        USB_COM_PORT::queue_payload(DATA::IMU_CALIBRATION_DATA, pb);
         delete pb;
         break;
       }

@@ -43,6 +43,8 @@ class MobiController {
     POZYX = 0x2a,
     POZYX_CONFIG = 0x2b,
     IMU_CALIBRATION_STATUS = 0x2c,
+    IMU_GET_CALIBRATION_DATA = 0x2d,
+    IMU_SET_CALIBRATION_DATA = 0x2e,
     DISABLE_ALL_INTERVALS = 0x3d,
     FIRMWARE_INFO = 0x3e,
   };
@@ -61,6 +63,7 @@ class MobiController {
     POZYX_INFO = 0x9,
     POZYX_POWER_STATE = 0xa,
     IMU_CALIBRATION_STATUS = 0xb,
+    IMU_CALIBRATION_DATA = 0xc,
     FIRMWARE_INFO = 0x3f,
   };
 
