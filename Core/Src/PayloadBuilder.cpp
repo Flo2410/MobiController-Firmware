@@ -26,6 +26,12 @@ void PayloadBuilder::append_uint16(uint16_t number) {
   this->payload.insert(this->payload.end(), buffer, buffer + 2);
 }
 
+void PayloadBuilder::append_int16(int16_t number) {
+  uint8_t buffer[sizeof(int16_t)];
+  etl::mem_copy((uint8_t*)&number, sizeof(int16_t), buffer);
+  this->payload.insert(this->payload.end(), buffer, buffer + sizeof(int16_t));
+}
+
 void PayloadBuilder::append_uint32(uint32_t number) {
   uint8_t buffer[4];
   etl::mem_copy((uint8_t*)&number, 4, buffer);
@@ -49,6 +55,12 @@ void PayloadBuilder::append_vector(Bno055::vector_t vec) {
   this->append_double(vec.x);
   this->append_double(vec.y);
   this->append_double(vec.z);
+}
+
+void PayloadBuilder::append_vector(Bno055::vector_xyz_int16_t vec) {
+  this->append_int16(vec.x);
+  this->append_int16(vec.y);
+  this->append_int16(vec.z);
 }
 
 void PayloadBuilder::append_vector(Pozyx::vector_t vec) {

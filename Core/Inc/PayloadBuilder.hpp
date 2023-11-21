@@ -16,10 +16,12 @@ class PayloadBuilder {
 
   void append_uint8(uint8_t number);
   void append_uint16(uint16_t number);
+  void append_int16(int16_t number);
   void append_uint32(uint32_t number);
   void append_float(float number);
   void append_double(double number);
   void append_vector(Bno055::vector_t vec);
+  void append_vector(Bno055::vector_xyz_int16_t vec);
   void append_vector(Pozyx::vector_t vec);
   void append_string(etl::string<255> str);
 
