@@ -62,7 +62,7 @@ void MobiController::loop() {
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
   // Check that the recived id is a valid command.
-  if ((min_id >= 0x20 && min_id <= 0x2B) || min_id == 0x3e || min_id == 0x3d) {
+  if ((min_id >= 0x20 && min_id <= 0x2C) || min_id == 0x3e || min_id == 0x3d) {
     QueuedCommand cmd = {
         .min_id = static_cast<COMMANDS>(min_id),
         .payload = etl::vector<uint8_t, MAX_PAYLOAD>(min_payload, min_payload + len_payload)};
@@ -558,6 +558,11 @@ void MobiController::handle_command_queue() {
         break;
       }
 
+      case COMMANDS::IMU_CALIBRATION_STATUS: {
+        this->handle_basic_command(cmd, DATA::IMU_CALIBRATION_STATUS);
+        break;
+      }
+
       case COMMANDS::DISABLE_ALL_INTERVALS: {
         this->disable_all_periodic_updates();
         this->send_status(STATUS_CODE::OK);
@@ -817,6 +822,20 @@ void MobiController::handle_data_frame_queue() {
 
       case DATA::POZYX_POWER_STATE: {
         USB_COM_PORT::queue_byte(DATA::POZYX_POWER_STATE, this->pwr_manager->get_power_pozyx());
+        break;
+      }
+
+      case DATA::IMU_CALIBRATION_STATUS: {
+        PayloadBuilder *pb = new PayloadBuilder();
+
+        auto calib_state = this->imu->get_calibration_state();
+        pb->append_uint8(calib_state.sys);
+        pb->append_uint8(calib_state.gyro);
+        pb->append_uint8(calib_state.mag);
+        pb->append_uint8(calib_state.accel);
+
+        USB_COM_PORT::queue_payload(DATA::IMU_CALIBRATION_STATUS, pb);
+        delete pb;
         break;
       }
 

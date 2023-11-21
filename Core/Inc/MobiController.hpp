@@ -42,6 +42,7 @@ class MobiController {
     POZYX_POWER = 0x29,
     POZYX = 0x2a,
     POZYX_CONFIG = 0x2b,
+    IMU_CALIBRATION_STATUS = 0x2c,
     DISABLE_ALL_INTERVALS = 0x3d,
     FIRMWARE_INFO = 0x3e,
   };
@@ -59,6 +60,7 @@ class MobiController {
     POZYX = 0x8,
     POZYX_INFO = 0x9,
     POZYX_POWER_STATE = 0xa,
+    IMU_CALIBRATION_STATUS = 0xb,
     FIRMWARE_INFO = 0x3f,
   };
 
@@ -86,6 +88,11 @@ class MobiController {
     ENCODER_2 = 0x2,
     ENCODER_3 = 0x4,
     ENCODER_4 = 0x8,
+  };
+
+  enum class USER_BUTTON_MODE {
+    INTERNAL = 0x0,
+    EXTERNAL = 0x1,
   };
 
   enum class ANIMATION_PRESET {
