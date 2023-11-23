@@ -5,6 +5,7 @@
 #include "Pozyx.hpp"
 #include "UserButtton.hpp"
 #include "bh1750.hpp"
+#include "bootloader.hpp"
 #include "can.h"
 #include "can_lib.hpp"
 #include "cpp_main.hpp"
@@ -62,7 +63,7 @@ void MobiController::loop() {
 
 void MobiController::queue_command(uint8_t min_id, uint8_t const *min_payload, uint8_t len_payload) {
   // Check that the recived id is a valid command.
-  if ((min_id >= 0x20 && min_id <= 0x2E) || min_id == 0x3e || min_id == 0x3d) {
+  if ((min_id >= 0x20 && min_id <= 0x2E) || (min_id >= 0x3c && min_id <= 0x3e)) {
     QueuedCommand cmd = {
         .min_id = static_cast<COMMANDS>(min_id),
         .payload = etl::vector<uint8_t, MAX_PAYLOAD>(min_payload, min_payload + len_payload)};
@@ -602,6 +603,12 @@ void MobiController::handle_command_queue() {
 
         this->imu->set_calibration_data(calib_data);
         this->send_status(STATUS_CODE::OK);
+        break;
+      }
+
+      case COMMANDS::JUMP_TO_BOOTLOADER: {
+        this->send_status(STATUS_CODE::OK);
+        JumpToBootloader();
         break;
       }
 

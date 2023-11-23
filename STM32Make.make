@@ -93,6 +93,7 @@ Core/Src/PowerManager.cpp \
 Core/Src/Pozyx.cpp \
 Core/Src/UserButton.cpp \
 Core/Src/bh1750.cpp \
+Core/Src/bootloader.cpp \
 Core/Src/c_bridge.cpp \
 Core/Src/can_lib.cpp \
 Core/Src/cpp_main.cpp \
