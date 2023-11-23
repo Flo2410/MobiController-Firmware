@@ -10,7 +10,7 @@ Als Entwicklungsumgebung wird VS Code mit der Erweiterung [stm32-for-vscode](htt
 ## Flashen eines Release
 
 Um einen vorhandenen Release zu flashen, muss zuerst die entsprechende `MobiController-Firmware.elf` von der [Releaseseite](https://github.com/Flo2410/MobiController-Firmware/releases) heruntergeladen werden.
-Anschließend muss die ELF Datei in den Build-Ornder verschoben werden, sodass der Dateipfad `./build/MobiController-Firmware.elf` lautet.
+Anschließend muss die ELF Datei in den Build-Ordner verschoben werden, sodass der Dateipfad `./build/MobiController-Firmware.elf` lautet.
 Der Flash-Prozess kann nun mittels folgendem Befehl gestartet werden.
 
 ```bash
