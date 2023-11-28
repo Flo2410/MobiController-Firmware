@@ -227,9 +227,9 @@ void battery_warning_light() {
   blink({255, 0, 0, 0}, 10, NUM_PIXELS, 1);
 }
 
-void power_on_animation() {
+void power_on_animation(COLOR_RGBW color) {
   // MobiController::mobictl().pwr_manager->set_power_led(true);
-  fill({255, 255, 0, 0}, 1, NUM_PIXELS * 2, false);
+  fill(color, 1, NUM_PIXELS * 2, false);
 }
 
 void beacon_rgbw(COLOR_RGBW color, uint8_t update_rate, uint8_t frame_count, uint8_t line_length, uint8_t line_count, bool rotate_left) {

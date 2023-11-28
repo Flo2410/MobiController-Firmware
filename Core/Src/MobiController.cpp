@@ -233,7 +233,7 @@ MobiController::MobiController() {
 
   // power on animation with led strip
   this->pwr_manager->set_power_led(true);
-  LED_STRIP::power_on_animation();
+  LED_STRIP::power_on_animation({255, 255, 0, 0});  // Yellow boot animation
 }
 
 void MobiController::handle_count_to_30_sec() {
