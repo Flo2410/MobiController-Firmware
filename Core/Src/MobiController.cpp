@@ -608,6 +608,9 @@ void MobiController::handle_command_queue() {
 
       case COMMANDS::JUMP_TO_BOOTLOADER: {
         this->send_status(STATUS_CODE::OK);
+        this->pwr_manager->set_power_led(true);
+        LED_STRIP::power_on_animation({165, 0, 255, 0});
+        HAL_Delay(1800);
         JumpToBootloader();
         break;
       }
