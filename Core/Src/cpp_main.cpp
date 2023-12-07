@@ -17,6 +17,20 @@ int cpp_main() {
   printf("Time of compilation: %s %s\n", __DATE__, __TIME__);
   printf("Compiler version: %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
   printf("Copyright FHWN Florian Hye\n");
+  printf("---------------------------------------------\n");
+
+#ifdef MIN_DEBUG_PRINTING
+  printf("MIN_DEBUG_PRINTING: enabled\n");
+#else
+  printf("MIN_DEBUG_PRINTING: disabled\n");
+#endif
+
+#ifdef MOBI_DEBUG
+  printf("MOBI_DEBUG: enabled\n");
+#else
+  printf("MOBI_DEBUG: disabled\n");
+#endif
+
   printf("---------------------------------------------\n\n");
 
   while (1) {
